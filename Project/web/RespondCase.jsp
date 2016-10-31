@@ -98,7 +98,8 @@
                     <input type="submit" name="send_for_approval" value="Send For Approval" />
             <%
                 }
-            %>
+            %>            
+            <input type="button" onclick="history.go(-1);" value="Back">
         </form>    
         <%
             }

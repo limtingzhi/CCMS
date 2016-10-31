@@ -15,7 +15,7 @@ import java.util.*;
 public class CaseDAO {
     private EmployeeDAO empDAO;
     private PersonDAO personDAO;
-    private static final String GET_CASE_BY_EMP_ID = "SELECT cc.complaint_case_id, cc.expected_response_date, cc.issue, cc.difficulty, ch.received_date, ch.last_saved FROM complaint_case cc, complaint_case_handling ch WHERE cc.complaint_case_id = ch.complaint_case_id AND ch.employee_id = ?  AND ch.response_date IS NULL ORDER BY ch.received_date asc";
+    private static final String GET_CASE_BY_EMP_ID = "SELECT c.reported_date, cc.complaint_case_id, cc.issue, cc.difficulty, ch.received_date, ch.last_saved FROM cases c, complaint_case cc, complaint_case_handling ch WHERE c.case_id = cc.complaint_case_id AND cc.complaint_case_id = ch.complaint_case_id AND ch.employee_id = ?  AND ch.response_date IS NULL ORDER BY ch.received_date asc";
     private static final String GET_CASE_BY_CASE_ID = "SELECT p.nric, p.email, p.name, p.contact_no, c.description, cc.difficulty, cc.issue, cc.additional_info, ch.response FROM cases c, complaint_case cc, complaint_case_handling ch, person p WHERE ch.complaint_case_id = ? AND ch.response_date IS NULL AND c.case_id = cc.complaint_case_id AND cc.complaint_case_id = ch.complaint_case_id AND c.person_nric = p.nric";
     private static final String UPDATE_CASE_RESPONSE = "UPDATE complaint_case_handling SET response = ?, response_date = CAST(? AS DATETIME), last_saved = ? WHERE employee_id = ? AND complaint_case_id = ?"; 
     private static final String SAVE_CASE_RESPONSE = "UPDATE complaint_case_handling SET response = ?, last_saved = ? WHERE employee_id = ? AND complaint_case_id = ?"; 
@@ -73,7 +73,8 @@ public class CaseDAO {
                    int caseID = rs.getInt("complaint_case_id");
                    String dateReceived = df.format(rs.getDate("received_date"));                   
                    String difficulty = rs.getString("difficulty");
-                   String expectedResponseDate = calculateExpectedResponseDate(difficulty);
+                   String reportedDate = rs.getString("reported_date");
+                   String expectedResponseDate = calculateExpectedResponseDate(difficulty, reportedDate);
                    String issue = rs.getString("issue");
                    String lastSaved = rs.getString("last_saved");
                    if(lastSaved == null) {
@@ -363,24 +364,23 @@ public class CaseDAO {
         return map;
     }
     
-    public String calculateExpectedResponseDate(String difficulty) throws ParseException {
+    public String calculateExpectedResponseDate(String difficulty, String dateStr) throws ParseException {
         //Assumption: received date is date recorded when the case is created in CCMS, not when they received the email.
         String expectedDate =  "";
         DateFormat dateFormat = new SimpleDateFormat("dd-MMM-yyyy");
-        Calendar cal = Calendar.getInstance();
-                
+
+        Calendar calG = new GregorianCalendar();        
+        
+        //Load list of holidays in 2016 from Holidays2016.txt
         Scanner sc = null;
         LinkedHashMap<Integer, String> holidays = new LinkedHashMap<Integer, String>();
         try {    
             File file = new File("./data/Holidays2016.txt");
             sc = new Scanner(file);
-            sc.nextLine();
             sc.useDelimiter(",|\r\n");
-            Calendar calG = new GregorianCalendar();
 
             while(sc.hasNext()) {
                 String date = sc.next();
-//                Date dateParse = (Date) dateFormat.parse(date);
                 calG.setTime(dateFormat.parse(date));
                 int dayOfYear = calG.get(Calendar.DAY_OF_YEAR);
                 holidays.put(dayOfYear, "");
@@ -392,7 +392,7 @@ public class CaseDAO {
                 sc.close();
             }
         }
-
+        
         int daysToAdd = 3; //Default to easy case
         if(difficulty.equalsIgnoreCase("hard")) {
             daysToAdd = 5;
@@ -400,10 +400,19 @@ public class CaseDAO {
             daysToAdd = 7;
         }
         
+        //Set the recorded date to calendar
+        SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss"); 
+        SimpleDateFormat sdf2 = new SimpleDateFormat("dd-M-yyyy hh:mm:ss");        
+        Calendar cal = Calendar.getInstance();
+        java.util.Date date = sdf1.parse(dateStr);
+        dateStr = sdf2.format(date);
+        cal.setTime(sdf2.parse(dateStr));
+        
         // iterate over the dates from now and check if each day is a business day
         int businessDayCounter = 0;
         while (businessDayCounter < daysToAdd) {
             int dayOfWeek = cal.get(Calendar.DAY_OF_WEEK);
+            //If the dayOfWeek hits Saturday, Sunday or Holiday, it will not add to businessDayCounter but it add one more day on the calendar
             if (dayOfWeek != Calendar.SATURDAY && dayOfWeek != Calendar.SUNDAY && !holidays.containsKey(cal.get(Calendar.DAY_OF_YEAR))) {
                 businessDayCounter++;
             }

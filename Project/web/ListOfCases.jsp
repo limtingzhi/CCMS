@@ -56,7 +56,6 @@
                 <td><% out.println(d); %></td>
                 <% } %>
                 <td><input type="submit" value="View / Respond" /></td>
-                <!--<td><img src="../Project/data/img/delete.png" height="10" width="10" /></td>-->
                 <input type="hidden" value="<%out.print(key);%>" name="caseID">
             </tr>
             </form>
@@ -70,5 +69,6 @@
                 out.println("There is no outstanding cases at the moment.");
             }
         %>
+        <input type="button" onclick="history.go(-1);" value="Back">
     </body>
 </html>
