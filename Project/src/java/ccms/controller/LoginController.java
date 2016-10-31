@@ -42,7 +42,7 @@ public class LoginController extends HttpServlet {
 
         // Check if username or password is empty string
         if (inputUserName.equalsIgnoreCase("") || inputPassWord.equals("")) {
-            request.setAttribute("errorMsg", "Please enter both username and password");
+            request.setAttribute("errorMsg", "Please enter both username and password.");
         } else {
             ArrayList<Employee> list = employeeDAO.getAllEmployee();
 
@@ -59,10 +59,10 @@ public class LoginController extends HttpServlet {
                         response.sendRedirect("Home.jsp");
                         return;
                     } else {
-                        request.setAttribute("errorMsg", "Invalid username/password");
+                        request.setAttribute("errorMsg", "Invalid username/password.");
                     }
                 } else {
-                    request.setAttribute("errorMsg", "Invalid username/password");
+                    request.setAttribute("errorMsg", "Invalid username/password.");
                 }
             }
         }
