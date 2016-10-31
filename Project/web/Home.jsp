@@ -24,7 +24,7 @@
     </head>
     <body>
         <h1>Welcome <%= name%>! </h1>
-
+        <p><a href="ListOfCases.jsp">List of cases</a></p>
         <p><a href="Logout.jsp">Logout</a></p>
     </body>
 </html>

@@ -12,8 +12,9 @@ public class Employee {
     private String password;
     private boolean onLeave;
     private Department dept;
+    private int inCharge_id;
 
-    public Employee(int employeeID, String name, String position, String username, String password, boolean onLeave, Department dept) {
+    public Employee(int employeeID, String name, String position, String username, String password, boolean onLeave, Department dept, int inCharge_id) {
         this.employeeID = employeeID;
         this.name = name;
         this.position = position;
@@ -21,6 +22,7 @@ public class Employee {
         this.password = password;
         this.onLeave = onLeave;
         this.dept = dept;
+        this.inCharge_id = inCharge_id;
     }
 
     public int getEmployeeID() {
@@ -49,5 +51,13 @@ public class Employee {
 
     public Department getDept() {
         return dept;
+    }
+    
+    public int getInchargeID() {
+        return inCharge_id;
+    }
+    
+    public void setIncharge(int inCharge_id) {
+        this.inCharge_id = inCharge_id;
     }
 }
