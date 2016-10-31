@@ -43,7 +43,7 @@
                 <a class="features" href="ListOfCases.jsp">
                     <img src="img/handle.png"><br>
                     Handle</a>
-                <a class="features" href="SearchCases.jsp">
+                <a class="features" href="SearchCase.jsp">
                     <img src="img/search.png"><br>
                     Search</a>
                 <a class="features" href="Home.jsp">
