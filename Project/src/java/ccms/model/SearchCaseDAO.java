@@ -10,18 +10,12 @@ import java.sql.*;
 import java.util.*;
 
 public class SearchCaseDAO {
-    private static final String GET_ALL_CASE = "select t1.case_id, t1.reported_date, t2.name, t2.nric, t2.contact_no, t2.email, t1.type, t4.status, t1.description, t4.difficulty, t4.issue, t4.addtional_info, t4.closing_remark from \n" +
-"ccms_db.case as t1 LEFT JOIN ccms_db.person as t2 ON t1.person_nric=t2.nric,\n" +
-"ccms_db.case as t3 LEFT JOIN ccms_db.complaint_case as t4 ON t3.case_id=t4.complaint_case_id;";
-    private static final String SEARCH_CASE = "select t1.case_id, t1.reported_date, t2.name, t2.nric, t2.contact_no, t2.email, t1.type, t4.status, t1.description, t4.difficulty, t4.issue, t4.addtional_info, t4.closing_remark from \n" +
-"ccms_db.case as t1 LEFT JOIN ccms_db.person as t2 ON t1.person_nric=t2.nric,\n" +
-"ccms_db.case as t3 LEFT JOIN ccms_db.complaint_case as t4 ON t3.case_id=t4.complaint_case_id WHERE \n"+
-"t1.case_id=? AND t2.nric=?";
-    private static final String SHOW_CASE = "select t1.case_id, t1.reported_date, t2.name, t2.nric, t2.contact_no, t2.email, t1.type, t4.status, t1.description, t4.difficulty, t4.issue, t4.addtional_info, t4.closing_remark from \n" +
-"ccms_db.case as t1 LEFT JOIN ccms_db.person as t2 ON t1.person_nric=t2.nric,\n" +
-"ccms_db.case as t3 LEFT JOIN ccms_db.complaint_case as t4 ON t3.case_id=t4.complaint_case_id WHERE \n"+
-"t1.case_id=? AND t2.nric=?";
-    private static final String ADD_INFO = "update ccms_db.complaint_case SET addtional_info=? WHERE \n"+
+    private static final String GET_ALL_CASE = "select c.case_id, c.reported_date, p.name, p.nric, p.contact_no, p.email, c.type, cc.status, c.description, cc.difficulty, cc.issue, cc.additional_info, cc.closing_remark from person p, cases c, complaint_case cc where p.nric = c.person_nric and c.case_id = cc.complaint_case_id";
+    private static final String SEARCH_CASE = "select c.case_id, c.reported_date, p.name, p.nric, p.contact_no, p.email, c.type, cc.status, c.description, cc.difficulty, cc.issue, cc.additional_info, cc.closing_remark from person p, cases c, complaint_case cc where p.nric = c.person_nric and c.case_id = cc.complaint_case_id AND \n"+
+"c.case_id=? AND p.nric=?";
+    private static final String SHOW_CASE = "select c.case_id, c.reported_date, p.name, p.nric, p.contact_no, p.email, c.type, cc.status, c.description, cc.difficulty, cc.issue, cc.additional_info, cc.closing_remark from person p, cases c, complaint_case cc where p.nric = c.person_nric and c.case_id = cc.complaint_case_id AND \n"+
+"c.case_id=? AND p.nric=?";
+    private static final String ADD_INFO = "update ccms_db.complaint_case SET additional_info=? WHERE \n"+
             "complaint_case_id=?";
     private static final String ARCHIVE_CASE = "update ccms_db.complaint_case SET closing_remark=?, status='Closed' WHERE \n"+
             "complaint_case_id=?";
@@ -53,7 +47,7 @@ public class SearchCaseDAO {
                         rs.getString("description"),
                         rs.getString("difficulty"),
                         rs.getString("issue"),
-                        rs.getString("addtional_info"),
+                        rs.getString("additional_info"),
                         rs.getString("closing_remark"));
                 caseList.add(case1);
             }
@@ -111,7 +105,7 @@ public class SearchCaseDAO {
                         rs.getString("description"),
                         rs.getString("difficulty"),
                         rs.getString("issue"),
-                        rs.getString("addtional_info"),
+                        rs.getString("additional_info"),
                         rs.getString("closing_remark"));
                 caseList.add(case1);
             }
@@ -169,7 +163,7 @@ public class SearchCaseDAO {
                         rs.getString("description"),
                         rs.getString("difficulty"),
                         rs.getString("issue"),
-                        rs.getString("addtional_info"),
+                        rs.getString("additional_info"),
                         rs.getString("closing_remark"));
                 caseList.add(case1);
             }

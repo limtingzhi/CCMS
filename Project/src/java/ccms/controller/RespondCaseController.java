@@ -84,7 +84,7 @@ public class RespondCaseController extends HttpServlet {
                 }
             } else {
                 update = caseDAO.updateCaseResponse(case_response, date, employeeID, caseID);
-                String status = "replied";
+                String status = "Replied";
                 //EMPLOYEE SAVE RESPONSE AND EMAIL COMPLAINANT
                 if(request.getParameter("save_and_email") != null) {
                     int update1 = caseDAO.updateCaseStatus(status, caseID);
@@ -101,7 +101,7 @@ public class RespondCaseController extends HttpServlet {
                     int inChargeID = eDAO.getEmployeeByID(employeeID).getInchargeID();                                    
                     Employee inCharge = eDAO.getEmployeeByID(inChargeID);
                     String inChargePosition = inCharge.getPosition();
-                    status = "pending - " + inChargePosition;
+                    status = "Pending - " + inChargePosition;
                     
                     int update1 = caseDAO.routeCaseToIncharge(caseID, inChargeID, date);
                     int update2 = caseDAO.updateCaseStatus(status, caseID);

@@ -27,7 +27,7 @@
     </head>
     <body>
         <p><b>Search Case:</b></p>
-        <form class="form-horizontal" name="login_form" method="post" action="SearchCase.do">
+        <form class="form-horizontal" align="center" name="login_form" method="post" action="SearchCase.do">
             <div class="form-group">
                 <label for="caseid" class="control-label col-xs-2">Person's Name:</label>
                 <div class="col-xs-10">

@@ -15,7 +15,7 @@ import java.util.*;
 public class CaseDAO {
     private EmployeeDAO empDAO;
     private PersonDAO personDAO;
-    private static final String GET_CASE_BY_EMP_ID = "SELECT c.reported_date, cc.complaint_case_id, cc.issue, cc.difficulty, ch.received_date, ch.last_saved FROM cases c, complaint_case cc, complaint_case_handling ch WHERE c.case_id = cc.complaint_case_id AND cc.complaint_case_id = ch.complaint_case_id AND ch.employee_id = ?  AND ch.response_date IS NULL ORDER BY ch.received_date asc";
+    private static final String GET_CASE_BY_EMP_ID = "SELECT c.reported_date, cc.complaint_case_id, cc.issue, cc.difficulty, ch.received_date, ch.last_saved FROM cases c, complaint_case cc, complaint_case_handling ch WHERE c.case_id = cc.complaint_case_id AND cc.complaint_case_id = ch.complaint_case_id AND ch.employee_id = ?  AND cc.status NOT IN ('Replied', 'Closed') ORDER BY ch.received_date asc";
     private static final String GET_CASE_BY_CASE_ID = "SELECT p.nric, p.email, p.name, p.contact_no, c.description, cc.difficulty, cc.issue, cc.additional_info, ch.response FROM cases c, complaint_case cc, complaint_case_handling ch, person p WHERE ch.complaint_case_id = ? AND ch.response_date IS NULL AND c.case_id = cc.complaint_case_id AND cc.complaint_case_id = ch.complaint_case_id AND c.person_nric = p.nric";
     private static final String UPDATE_CASE_RESPONSE = "UPDATE complaint_case_handling SET response = ?, response_date = CAST(? AS DATETIME), last_saved = ? WHERE employee_id = ? AND complaint_case_id = ?"; 
     private static final String SAVE_CASE_RESPONSE = "UPDATE complaint_case_handling SET response = ?, last_saved = ? WHERE employee_id = ? AND complaint_case_id = ?"; 
