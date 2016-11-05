@@ -124,3 +124,13 @@ input, select {
     color: #DD4B39;
     padding-top: 10px;
 }
+
+#title {
+    margin-bottom: 15px;
+    text-align: right;
+    width: 100%;
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    color: #232323;
+}

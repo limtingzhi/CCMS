@@ -23,7 +23,7 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>MOM Complaints & Compliments Management System (CCMS) - Home</title>
+        <title>MOM CCMS - Home</title>
         <link rel="stylesheet" href="css/main.css">
         <link rel="stylesheet" href="css/home.css">
     </head>
