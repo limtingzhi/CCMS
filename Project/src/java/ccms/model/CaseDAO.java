@@ -7,6 +7,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.sql.Date;
 
 /**
  *
@@ -26,6 +27,17 @@ public class CaseDAO {
     private static final String UPDATE_CASE_STATUS = "UPDATE complaint_case SET status = ? WHERE complaint_case_id = ?";
     private static final String AUTO_UPDATE_CASE_2_WEEKS = "UPDATE complaint_case SET status = 'Closed' WHERE complaint_case_id IN (SELECT complaint_case_id FROM (SELECT complaint_case_id, MAX(response_date) AS response_date FROM complaint_case_handling WHERE response_date IS NOT NULL GROUP BY complaint_case_id HAVING DATEDIFF(NOW(), response_date) > 14) as temp)";
     private static final String GET_OUTSTANDING_CASES = "SELECT c.reported_date, cc.issue, cc.difficulty, cc.add_on_date, ch.complaint_case_id, ch.employee_id, MAX(received_date) AS received, ch.response, ch.last_saved FROM cases c, complaint_case_handling ch, complaint_case cc WHERE c.case_id = cc.complaint_case_id AND cc.complaint_case_id = ch.complaint_case_id AND ch.response_date IS NULL GROUP BY ch.complaint_case_id";
+    private static final String GET_REPORTEDDATE_BY_CASE_ID = "SELECT c.reported_date FROM cases c WHERE c.case_id = ?";
+    private static final String GET_DIFFICULTY_BY_EMPID = "SELECT cc.difficulty\n" +
+        "FROM complaint_case cc, complaint_case_handling cch\n" +
+        "WHERE cc.complaint_case_id = cch.complaint_case_id\n" +
+        "AND cch.employee_id =?";
+    private static final String UPDATE_COMPLAINT_CASE = "UPDATE complaint_case\n" +
+        "SET status=?\n" +
+        "WHERE complaint_case_id=?";
+    private static final String INSERT_COMPLAINT_CASE_HANDLING = "INSERT INTO complaint_case_handling\n" +
+        "VALUES (?,?,?,NULL,NULL,NULL)\n";
+
     
     public CaseDAO() throws ParseException {
         autoUpdateCaseStatus();
@@ -519,4 +531,171 @@ public class CaseDAO {
         expectedDate = sdf2.format(cal.getTime());
         return expectedDate;
     }
+    
+    public Timestamp getReportedDateOfCase(int caseID) throws ParseException {
+
+        Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        Timestamp reportedDate = null;
+        try {
+            con = ConnectionManager.getConnection();
+            ps = con.prepareStatement(GET_REPORTEDDATE_BY_CASE_ID);
+            ps.setInt(1, caseID);
+            rs = ps.executeQuery();
+            
+
+            while (rs.next()) {
+                reportedDate = rs.getTimestamp("reported_date");
+            }
+        } catch (SQLException se) {
+            se.printStackTrace();
+        } finally {
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            if (ps != null) {
+                try {
+                    ps.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            if (con != null) {
+                try {
+                    con.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return reportedDate;
+    }
+    
+    public int getWorkloadByEmpID(int empID) throws ParseException {
+        
+        
+        Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        int overallWorkLoad = 0;
+        try {
+            con = ConnectionManager.getConnection();
+            ps = con.prepareStatement(GET_DIFFICULTY_BY_EMPID);
+            ps.setInt(1, empID);
+            rs = ps.executeQuery();
+            
+            int easy = 0;
+            int hard = 0;
+            int scomplex = 0;
+                    
+            while (rs.next()) {
+                String difficulty = rs.getString("difficulty");
+                if (difficulty.equalsIgnoreCase("Easy")) {
+                    easy++;
+                }else if (difficulty.equalsIgnoreCase("Hard")){
+                    hard++;
+                }else{
+                    scomplex++;
+                }
+            }
+            
+            overallWorkLoad = (easy*3)+(hard*5)+(scomplex*7);
+            
+        } catch (SQLException se) {
+            se.printStackTrace();
+        } finally {
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            if (ps != null) {
+                try {
+                    ps.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            if (con != null) {
+                try {
+                    con.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return overallWorkLoad;
+    }
+    
+    public int updateComplaintCase(String status, int caseID) {
+        Connection con = null;
+        PreparedStatement ps = null;
+        int rowUpdate = 0;
+        try {
+            con = ConnectionManager.getConnection();
+            ps = con.prepareStatement(UPDATE_COMPLAINT_CASE);
+            ps.setString(1, status);
+            ps.setInt(2, caseID);
+            rowUpdate = ps.executeUpdate();
+        } catch (SQLException se) {
+            se.printStackTrace();
+        } finally {
+            if (ps != null) {
+                try {
+                    ps.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            if (con != null) {
+                try {
+                    con.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return rowUpdate;
+    }
+    
+    public int insertComplaintCaseHandling(int caseID, int empID) {
+        Date received_date = new java.sql.Date(Calendar.getInstance().getTimeInMillis());
+        Connection con = null;
+        PreparedStatement ps = null;
+        int rowUpdate = 0;
+        try {
+            con = ConnectionManager.getConnection();
+            ps = con.prepareStatement(INSERT_COMPLAINT_CASE_HANDLING);
+            ps.setInt(1, caseID);
+            ps.setInt(2, empID);
+            ps.setDate(3, received_date);
+            rowUpdate = ps.executeUpdate();
+        } catch (SQLException se) {
+            se.printStackTrace();
+        } finally {
+            if (ps != null) {
+                try {
+                    ps.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            if (con != null) {
+                try {
+                    con.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return rowUpdate;
+    }
+    
 }
