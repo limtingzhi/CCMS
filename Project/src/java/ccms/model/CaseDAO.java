@@ -26,7 +26,9 @@ public class CaseDAO {
     private static final String UPDATE_CASE_STATUS = "UPDATE complaint_case SET status = ? WHERE complaint_case_id = ?";
     private static final String AUTO_UPDATE_CASE_2_WEEKS = "UPDATE complaint_case SET status = 'Closed' WHERE complaint_case_id IN (SELECT complaint_case_id FROM (SELECT complaint_case_id, MAX(response_date) AS response_date FROM complaint_case_handling WHERE response_date IS NOT NULL GROUP BY complaint_case_id HAVING DATEDIFF(NOW(), response_date) > 14) as temp)";
     private static final String GET_OUTSTANDING_CASES = "SELECT c.reported_date, cc.issue, cc.difficulty, cc.add_on_date, ch.complaint_case_id, ch.employee_id, MAX(received_date) AS received, ch.response, ch.last_saved FROM cases c, complaint_case_handling ch, complaint_case cc WHERE c.case_id = cc.complaint_case_id AND cc.complaint_case_id = ch.complaint_case_id AND ch.response_date IS NULL GROUP BY ch.complaint_case_id";
-    
+    private static final String INSERT_NEW_CASE = "INSERT INTO cases (description, reported_date, type, recorded_employee_id, person_nric) VALUES (?,CAST(? AS DATETIME),?,?,?)";
+    private static final String INSERT_COMPLAINT_CASE = "INSERT INTO complaint_case (complaint_case_id, difficulty, issue, status, add_on_date, additional_info, closing_remark) VALUES (?,?,?,?,?,?,?)";
+
     public CaseDAO() throws ParseException {
         autoUpdateCaseStatus();
         load();
@@ -67,7 +69,7 @@ public class CaseDAO {
             }
         }
     }
-    
+
     public LinkedHashMap<Integer, ArrayList<String>> getOutstandingCases() throws ParseException {
         LinkedHashMap<Integer, ArrayList<String>> cases = new LinkedHashMap<Integer, ArrayList<String>>();
         SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy");
@@ -518,5 +520,75 @@ public class CaseDAO {
         sdf2 = new SimpleDateFormat("dd/MM/yyyy");
         expectedDate = sdf2.format(cal.getTime());
         return expectedDate;
+    }
+
+    public int createCase(complaintCase c) {
+        Connection con = null;
+        PreparedStatement ps = null;
+        int rowUpdate = 0;
+        try {
+            con = ConnectionManager.getConnection();
+            ps = con.prepareStatement(INSERT_NEW_CASE);
+            ps.setString(1, c.getDescription());
+            ps.setDate(2, c.getReported_date());
+            ps.setString(3, c.getType());
+            ps.setInt(4, c.getRecorded_employee_id());
+            ps.setString(5, c.getPerson_nric());
+            rowUpdate = ps.executeUpdate();
+        } catch (SQLException se) {
+            se.printStackTrace();
+        } finally {
+            if (ps != null) {
+                try {
+                    ps.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            if (con != null) {
+                try {
+                    con.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return rowUpdate;
+    }
+
+    public int createComplaintCase(complaintCase c) {
+        Connection con = null;
+        PreparedStatement ps = null;
+        int rowUpdate = 0;
+        try {
+            con = ConnectionManager.getConnection();
+            ps = con.prepareStatement(INSERT_COMPLAINT_CASE);
+            ps.setString(1, "");
+            ps.setString(2, c.getDifficulty());
+            ps.setString(3, c.getIssues());
+            ps.setString(4, "pending - Senior Executive");
+            ps.setString(5, null);
+            ps.setString(6, null);
+            ps.setString(7, null);
+            rowUpdate = ps.executeUpdate();
+        } catch (SQLException se) {
+            se.printStackTrace();
+        } finally {
+            if (ps != null) {
+                try {
+                    ps.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            if (con != null) {
+                try {
+                    con.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return rowUpdate;
     }
 }
