@@ -15,10 +15,11 @@ public class SearchCaseDAO {
 "c.case_id=? AND p.nric=?";
     private static final String SHOW_CASE = "select c.case_id, c.reported_date, p.name, p.nric, p.contact_no, p.email, c.type, cc.status, c.description, cc.difficulty, cc.issue, cc.additional_info, cc.closing_remark from person p, cases c, complaint_case cc where p.nric = c.person_nric and c.case_id = cc.complaint_case_id AND \n"+
 "c.case_id=? AND p.nric=?";
-    private static final String ADD_INFO = "update ccms_db.complaint_case SET additional_info=? WHERE \n"+
+    private static final String ADD_INFO = "update ccms_db.complaint_case SET additional_info = ?, add_on_date = CAST(? AS DATETIME), status = (SELECT concat('Pending - ', e.position) FROM complaint_case_handling ch, employee e WHERE e.employee_id = ch.employee_id AND ch.complaint_case_id = ? HAVING MAX(received_date)) WHERE \n"+
             "complaint_case_id=?";
     private static final String ARCHIVE_CASE = "update ccms_db.complaint_case SET closing_remark=?, status='Closed' WHERE \n"+
             "complaint_case_id=?";
+    private static final String INSERT_NEW_CASE_HANDLING = "INSERT INTO complaint_case_handling (complaint_case_id, employee_id, received_date, response_date, response, last_saved) VALUES (?, (SELECT employee_id FROM complaint_case_handling ch WHERE ch.complaint_case_id = ? HAVING MIN(received_date)), CAST(? AS DATETIME), NULL, NULL, NULL)";
     
     public SearchCaseDAO(){
     }
@@ -195,7 +196,7 @@ public class SearchCaseDAO {
         return caseList;
     }
     
-    public boolean addInfo(String addInfo, int caseID) {
+    public boolean addInfo(String addInfo, int caseID, String todayDate) {
         
         boolean success = false;
 
@@ -203,15 +204,16 @@ public class SearchCaseDAO {
         PreparedStatement pstmt = null;
         ResultSet rs = null;
 
-
         try {
 
             conn = ConnectionManager.getConnection();
             
             pstmt = conn.prepareStatement(ADD_INFO);
             pstmt.setString(1, addInfo);
-            pstmt.setInt(2, caseID);
-
+            pstmt.setString(2, todayDate);
+            pstmt.setInt(3, caseID);
+            pstmt.setInt(4, caseID);
+            
             if (pstmt.executeUpdate() > 0) {
                 success = true;
             }
@@ -240,6 +242,36 @@ public class SearchCaseDAO {
             pstmt = conn.prepareStatement(ARCHIVE_CASE);
             pstmt.setString(1, closingRemark);
             pstmt.setInt(2, caseID);
+
+            if (pstmt.executeUpdate() > 0) {
+                success = true;
+            }
+
+        } catch (SQLException e) {
+            success = false;
+
+        }
+
+        return success;
+    }
+     
+    public boolean revertCaseToFirstOwner(int caseID, String received_date) {
+        
+        boolean success = false;
+
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+
+
+        try {
+
+            conn = ConnectionManager.getConnection();
+            
+            pstmt = conn.prepareStatement(INSERT_NEW_CASE_HANDLING);
+            pstmt.setInt(1, caseID);
+            pstmt.setInt(2, caseID);
+            pstmt.setString(3, received_date);
 
             if (pstmt.executeUpdate() > 0) {
                 success = true;

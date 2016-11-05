@@ -13,6 +13,7 @@ import ccms.model.PersonDAO;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Properties;
@@ -40,7 +41,7 @@ public class RespondCaseController extends HttpServlet {
     private CaseDAO caseDAO;
     private EmployeeDAO eDAO;
     
-    public RespondCaseController() {
+    public RespondCaseController() throws ParseException {
         DepartmentDAO dDAO = new DepartmentDAO();
         this.eDAO = new EmployeeDAO(dDAO);
         PersonDAO pDAO = new PersonDAO();
@@ -103,7 +104,7 @@ public class RespondCaseController extends HttpServlet {
                     String inChargePosition = inCharge.getPosition();
                     status = "Pending - " + inChargePosition;
                     
-                    int update1 = caseDAO.routeCaseToIncharge(caseID, inChargeID, date);
+                    int update1 = caseDAO.routeCaseToRespectiveInCharge(caseID, inChargeID, date); //Route case to in charge (e.g executive to manager)
                     int update2 = caseDAO.updateCaseStatus(status, caseID);
 
                     //Return message

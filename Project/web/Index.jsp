@@ -15,6 +15,8 @@
         <link rel="stylesheet" href="css/main.css">
     </head>
     <%
+        new CaseDAO(); //To auto update case status to closed if there's no activity after 2 weeks
+        
         // Redirect user to home page if he has login
         Employee user = (Employee) session.getAttribute("loginuser");
 

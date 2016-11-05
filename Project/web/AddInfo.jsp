@@ -23,19 +23,26 @@
                 
                 SearchCaseDAO scDao = new SearchCaseDAO();
                 ArrayList<SearchCase> caseList = scDao.searchCase(caseIDInt, nric);
-                
+                SearchCase sc = caseList.get(0);
+                String complainantName = sc.getPersonName();
+                String complainantNRIC = sc.getPersonNric();
+                String email = sc.getEmail();
+                String additional_info = sc.getAdditionalInfo();
+                if(additional_info == null) {
+                    additional_info = "";
+                }
                 out.println("<h1>Case ID: " + caseID + "</h1>");
                 out.println("<h2><u>Complainant's Details</u></h2>");
                 out.println("<table>");
                 out.println("<tr>");
-                out.println("<td>Name: "+caseList.get(0).getPersonName()+"</td>");
+                out.println("<td>Name: " + complainantName + "</td>");
                 out.println("<td></td>");
-                out.println("<td>Contact: "+caseList.get(0).getContactNo()+" </td>");
+                out.println("<td>Contact: "+ sc.getContactNo()+" </td>");
                 out.println("</tr>");
                 out.println("<tr>");
-                out.println("<td>NRIC: "+caseList.get(0).getPersonNric()+"</td>");
+                out.println("<td>NRIC: " + complainantNRIC +"</td>");
                 out.println("<td></td>");
-                out.println("<td>Email: "+caseList.get(0).getEmail()+"</td>");
+                out.println("<td>Email: " + email +"</td>");
                 out.println("</tr>");
                 out.println("</table>");
                 out.println("<h2><u>Case Details</u></h2>");
@@ -47,8 +54,10 @@
         </br>
         <form name="submitResponse" method="post" action="ProcessAddInfo.do">
             <b>Additional Info: </b><br/>
-            <textarea name="addInfo" id="response" cols="60" rows="10"/><% out.print(caseList.get(0).getAdditionalInfo()); %> </textarea><br/>
-            <input type="hidden" name="caseID" value="<% out.print(caseID); %>"/>
+            <textarea name="addInfo" id="response" cols="60" rows="10"/><%=additional_info%> </textarea><br/>
+            <input type="hidden" name="caseID" value="<%=caseID%>"/>
+            <input type="hidden" name="complainantName" value="<%=complainantName%>"/>
+            <input type="hidden" name="email" value="<%=email%>"/>
             <input type="submit" value="Add Additional Info"/>
         </form>
         <input type="button" onclick="history.go(-1);" value="Back">

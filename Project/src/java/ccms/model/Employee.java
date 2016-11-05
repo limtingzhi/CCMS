@@ -1,5 +1,7 @@
 package ccms.model;
 
+import java.util.Date;
+
 /**
  *
  * @author limtingzhi
@@ -10,18 +12,20 @@ public class Employee {
     private String position;
     private String username;
     private String password;
-    private boolean onLeave;
     private Department dept;
+    private Date onLeaveStart;
+    private Date onLeaveEnd;
     private int inCharge_id;
 
-    public Employee(int employeeID, String name, String position, String username, String password, boolean onLeave, Department dept, int inCharge_id) {
+    public Employee(int employeeID, String name, String position, String username, String password, Department dept, Date onLeaveStart, Date onLeaveEnd, int inCharge_id) {
         this.employeeID = employeeID;
         this.name = name;
         this.position = position;
         this.username = username;
         this.password = password;
-        this.onLeave = onLeave;
         this.dept = dept;
+        this.onLeaveStart = onLeaveStart;
+        this.onLeaveEnd = onLeaveEnd;
         this.inCharge_id = inCharge_id;
     }
 
@@ -45,10 +49,6 @@ public class Employee {
         return password;
     }
 
-    public boolean isOnLeave() {
-        return onLeave;
-    }
-
     public Department getDept() {
         return dept;
     }
@@ -58,6 +58,30 @@ public class Employee {
     }
     
     public void setIncharge(int inCharge_id) {
+        this.inCharge_id = inCharge_id;
+    }
+    
+    public Date getOnLeaveStart() {
+        return onLeaveStart;
+    }
+
+    public void setOnLeaveStart(Date onLeaveStart) {
+        this.onLeaveStart = onLeaveStart;
+    }
+
+    public Date getOnLeaveEnd() {
+        return onLeaveEnd;
+    }
+
+    public void setOnLeaveEnd(Date onLeaveEnd) {
+        this.onLeaveEnd = onLeaveEnd;
+    }
+
+    public int getInCharge_id() {
+        return inCharge_id;
+    }
+
+    public void setInCharge_id(int inCharge_id) {
         this.inCharge_id = inCharge_id;
     }
 }
