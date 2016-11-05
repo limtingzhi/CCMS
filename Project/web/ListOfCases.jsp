@@ -1,5 +1,5 @@
 <%-- 
-    Document   : HandleCase
+    Document   : ListOfCases
     Created on : 23 Oct, 2016, 5:35:25 PM
     Author     : asus user
 --%>
@@ -40,23 +40,41 @@
                     <td>Difficulty</td>
                     <td>Issue</td>
                     <td>Last Saved</td>
-                    <td>Respond</td>
+                    <td>Action</td>
                 </tr>
             </thead>
             <tbody>
         <%            
             Set<Integer> keys = cList.keySet();
-            for(Integer key: keys) {
-                ArrayList<String> details = cList.get(key);                
+            boolean containResponse = true;
+            String personNRIC = null;
+            for(Integer caseID: keys) {
+                ArrayList<String> details = cList.get(caseID);  
+                containResponse = !details.get(details.size()-1).equals("-");
+                personNRIC = details.get(0);
         %>
             <form name="caseRespond" method="POST" action="CaseController.do">        
             <tr>
-                <td><% out.println(key); %></td>
-                <% for(String d: details) { %>
-                <td><% out.println(d); %></td>
+                <td><% out.println(caseID); %></td>
+                <% for(int i = 1; i < details.size(); i++) { %>
+                <td><% out.println(details.get(i)); %></td>
                 <% } %>
-                <td><input type="submit" value="View / Respond" /></td>
-                <input type="hidden" value="<%out.print(key);%>" name="caseID">
+                <td>
+                <% 
+                    if (containResponse) {
+                %>
+                <input type="submit" value="Continue" />
+                <%
+                    } else {
+                %>    
+                <input type="submit" value="Respond" />
+                <%  
+                    }
+                %>
+                <input type="submit" value="Archieve" onclick="this.form.action='ArchiveCase.jsp?caseid=<%=caseID%>&nric=<%=personNRIC%>'"/>
+                </td>
+                <input type="hidden" value="<%=personNRIC%>" name="personNRIC">
+                <input type="hidden" value="<%=caseID%>" name="caseID">
             </tr>
             </form>
         <%
@@ -69,6 +87,5 @@
                 out.println("There is no outstanding cases at the moment.");
             }
         %>
-        <input type="button" onclick="history.go(-1);" value="Back">
     </body>
 </html>

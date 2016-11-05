@@ -35,6 +35,7 @@
                 String additional_info = caseDetails.get(6);
                 String difficulty = caseDetails.get(7);
                 String responseMsg = caseDetails.get(9);
+                String addOnDate = caseDetails.get(caseDetails.size() - 1);
                 if(responseMsg == null) {
                     responseMsg = "";
                 }
@@ -54,7 +55,7 @@
                 out.println("</table>");
                 out.println("<h2><u>Case Details</u></h2>");
                 out.println("Description: " + description + "<br/>");
-                out.println("Additional Info: " + additional_info + "<br/>");
+                out.println("Additional Info " + addOnDate + ": " + additional_info + "<br/>");
                 out.println("Difficulty: " + difficulty + "<br/>");
                 out.println("Issue: " + caseDetails.get(8));
         %>

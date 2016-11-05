@@ -38,8 +38,10 @@ public class EmployeeDAO {
                         rs.getString("position"),
                         rs.getString("username"),
                         rs.getString("password"),
-                        rs.getBoolean("on_Leave"),
-                        dept, rs.getInt("inCharge_id"));
+                        dept, 
+                        rs.getDate("on_leave_start"),
+                        rs.getDate("on_leave_end"),
+                        rs.getInt("inCharge_id"));
 
                 employeeList.add(employee);
             }
@@ -134,8 +136,10 @@ public class EmployeeDAO {
                         rs.getString("position"),
                         rs.getString("username"),
                         rs.getString("password"),
-                        rs.getBoolean("on_Leave"),
-                        dept, rs.getInt("incharge_id"));
+                        dept, 
+                        rs.getDate("on_leave_start"),
+                        rs.getDate("on_leave_end"),
+                        rs.getInt("incharge_id"));
             }
         } catch (SQLException se) {
             se.printStackTrace();

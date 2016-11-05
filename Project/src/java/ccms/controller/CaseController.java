@@ -41,7 +41,7 @@ public class CaseController extends HttpServlet {
 
     private CaseDAO caseDAO;
     
-    public CaseController() {
+    public CaseController() throws ParseException {
         DepartmentDAO dDAO = new DepartmentDAO();
         EmployeeDAO eDAO = new EmployeeDAO(dDAO);
         PersonDAO pDAO = new PersonDAO();
@@ -64,9 +64,9 @@ public class CaseController extends HttpServlet {
             int caseID = Integer.parseInt(request.getParameter("caseID"));
 
             ArrayList<String> caseDetails = processCaseDetails(caseID);
-            
+           
             request.setAttribute("caseDetails", caseDetails);
-                        
+                       
             LinkedHashMap<Integer, ArrayList<String>> responses = caseDAO.getCaseResponses(caseID);
             request.setAttribute("responses", responses);
             
@@ -79,10 +79,20 @@ public class CaseController extends HttpServlet {
     }
     
     public ArrayList<String> processCaseDetails (int caseID) throws ParseException {
+        SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+        SimpleDateFormat sdf2 = new SimpleDateFormat("dd/M/yyyy");
         ArrayList<String> caseDetails = caseDAO.getCaseDetails(caseID);
         String additional_info = caseDetails.get(6);
         if(additional_info == null) { 
             caseDetails.set(6,"N/A");
+        }
+        int lastIndex = caseDetails.size()-1;
+        String addOnDate = caseDetails.get(lastIndex);
+        if(addOnDate == null) {
+            caseDetails.set(lastIndex, "");
+        } else {
+            Date d = sdf1.parse(addOnDate);
+            caseDetails.set(lastIndex, "(added on " + sdf2.format(d) + ")");
         }
         return caseDetails;
     }
