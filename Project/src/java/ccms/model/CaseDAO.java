@@ -28,6 +28,7 @@ public class CaseDAO {
     private static final String GET_OUTSTANDING_CASES = "SELECT c.reported_date, cc.issue, cc.difficulty, cc.add_on_date, ch.complaint_case_id, ch.employee_id, MAX(received_date) AS received, ch.response, ch.last_saved FROM cases c, complaint_case_handling ch, complaint_case cc WHERE c.case_id = cc.complaint_case_id AND cc.complaint_case_id = ch.complaint_case_id AND ch.response_date IS NULL GROUP BY ch.complaint_case_id";
     private static final String INSERT_NEW_CASE = "INSERT INTO cases (description, reported_date, type, recorded_employee_id, person_nric) VALUES (?,CAST(? AS DATETIME),?,?,?)";
     private static final String INSERT_COMPLAINT_CASE = "INSERT INTO complaint_case (complaint_case_id, difficulty, issue, status, add_on_date, additional_info, closing_remark) VALUES (?,?,?,?,?,?,?)";
+    private static final String INSERT_COMPLIMENT_CASE = "INSERT INTO compliment_case (complaint_case_id, dept) VALUES (?,?)";
 
     public CaseDAO() throws ParseException {
         autoUpdateCaseStatus();
@@ -559,17 +560,60 @@ public class CaseDAO {
     public int createComplaintCase(complaintCase c) {
         Connection con = null;
         PreparedStatement ps = null;
+        Statement stmt = null;
+        ResultSet rs = null;
+
         int rowUpdate = 0;
         try {
             con = ConnectionManager.getConnection();
+            stmt = con.createStatement();
+            rs = stmt.executeQuery("SELECT case_id FROM cases ORDER BY case_id DESC LIMIT 1");
             ps = con.prepareStatement(INSERT_COMPLAINT_CASE);
-            ps.setString(1, "");
+            rs.next();
+            ps.setString(1, rs.getString(1));
             ps.setString(2, c.getDifficulty());
             ps.setString(3, c.getIssues());
             ps.setString(4, "pending - Senior Executive");
             ps.setString(5, null);
             ps.setString(6, null);
             ps.setString(7, null);
+            rowUpdate = ps.executeUpdate();
+        } catch (SQLException se) {
+            se.printStackTrace();
+        } finally {
+            if (ps != null) {
+                try {
+                    ps.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            if (con != null) {
+                try {
+                    con.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return rowUpdate;
+    }
+
+    public int createComplimentCase(int dept) {
+        Connection con = null;
+        PreparedStatement ps = null;
+        Statement stmt = null;
+        ResultSet rs = null;
+
+        int rowUpdate = 0;
+        try {
+            con = ConnectionManager.getConnection();
+            stmt = con.createStatement();
+            rs = stmt.executeQuery("SELECT case_id FROM cases ORDER BY case_id DESC LIMIT 1 where type = compliment");
+            ps = con.prepareStatement(INSERT_COMPLIMENT_CASE);
+            rs.next();
+            ps.setString(1, rs.getString(1));
+            ps.setInt(2, dept);
             rowUpdate = ps.executeUpdate();
         } catch (SQLException se) {
             se.printStackTrace();

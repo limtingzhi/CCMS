@@ -12,7 +12,8 @@ import java.sql.Date;
  * @author Wayne
  */
 public class complaintCase {
-     private String description;
+
+    private String description;
     private Date reported_date;
     private String type;
     private int recorded_employee_id;
@@ -78,7 +79,7 @@ public class complaintCase {
         this.description = description;
     }
 
-        public void setReported_date(Date reported_date) {
+    public void setReported_date(Date reported_date) {
         this.reported_date = reported_date;
     }
 

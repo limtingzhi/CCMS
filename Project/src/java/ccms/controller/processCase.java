@@ -60,7 +60,8 @@ public class processCase extends HttpServlet {
                 casedao.createComplaintCase(new complaintCase(difficulty, issues));
             } else {
                 String employee = request.getParameter("employee_name");
-                String dept = request.getParameter("employee_dept");
+                int dept = Integer.parseInt(request.getParameter("employee_dept"));
+                casedao.createComplimentCase(dept);
             }
             //for multiple case, make sure u have a concat the 3 case difficulty
 
