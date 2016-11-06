@@ -23,7 +23,7 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>MOM Complaints & Compliments Management System (CCMS) - Home</title>
+        <title>MOM CCMS - Home</title>
         <link rel="stylesheet" href="css/main.css">
         <link rel="stylesheet" href="css/home.css">
     </head>
@@ -37,7 +37,7 @@
                 <div id="features-header">Features</div>
             </div>
             <div id="features-div">
-                <a class="features" href="Home.jsp">
+                <a class="features" href="CreateCase.jsp">
                     <img src="img/create.png"><br>
                     Create</a>
                 <a class="features" href="ListOfCases.jsp">
@@ -46,7 +46,7 @@
                 <a class="features" href="SearchCase.jsp">
                     <img src="img/search.png"><br>
                     Search</a>
-                <a class="features" href="/CCMS/ReassignCase">
+                <a class="features" href="ReassignCase.jsp">
                     <img src="img/reassign.png"><br>
                     Reassign</a>
                 <a class="features" href="Home.jsp">

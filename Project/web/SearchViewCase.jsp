@@ -4,50 +4,146 @@
     Author     : Feng Ru Chua
 --%>
 
+<%@page import="java.util.Set"%>
+<%@page import="java.util.LinkedHashMap"%>
 <%@page import="ccms.model.SearchCase"%>
 <%@page import="java.util.ArrayList"%>
 <%@page import="ccms.model.SearchCaseDAO"%>
+<%@include file="NavigationBar.jsp" %>
+<%@include file="Protect.jsp" %>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>Close/Archive Case</title>
+        <link rel="stylesheet" href="css/main.css">
+        <link rel="stylesheet" href="css/home.css">
+        <link rel="stylesheet" href="css/content.css">
+        <title>MOM CCMS - View Case</title>
     </head>
-    <body>
+    <body id="background-content">
         <%
-                String caseID = (String) request.getParameter("caseid");
-                String nric = (String) request.getParameter("nric");
-                
-                int caseIDInt = Integer.parseInt(caseID);
-                
-                SearchCaseDAO scDao = new SearchCaseDAO();
-                ArrayList<SearchCase> caseList = scDao.searchCase(caseIDInt, nric);
-                
-                out.println("<h1>Case ID: " + caseID + "</h1>");
-                out.println("<h2><u>Complainant's Details</u></h2>");
-                out.println("<table>");
-                out.println("<tr>");
-                out.println("<td>Name: "+caseList.get(0).getPersonName()+"</td>");
-                out.println("<td></td>");
-                out.println("<td>Contact: "+caseList.get(0).getContactNo()+" </td>");
-                out.println("</tr>");
-                out.println("<tr>");
-                out.println("<td>NRIC: "+caseList.get(0).getPersonNric()+"</td>");
-                out.println("<td></td>");
-                out.println("<td>Email: "+caseList.get(0).getEmail()+"</td>");
-                out.println("</tr>");
-                out.println("</table>");
-                out.println("<h2><u>Case Details</u></h2>");
-                out.println("Description: "+caseList.get(0).getDescription()+"<br/>");
-                out.println("Difficulty: "+caseList.get(0).getDifficulty()+"<br/>");
-                out.println("Status: "+caseList.get(0).getStatus()+"<br/>");
-                out.println("Issue: "+caseList.get(0).getIssue()+"<br/>");
-                out.println("Additional Info: "+caseList.get(0).getAdditionalInfo()+"<br/>");
-                out.println("Closing Remarks: "+caseList.get(0).getClosingRemark()+"<br/>");
-               
+            String caseID = (String) request.getParameter("caseid");
+            String nric = (String) request.getParameter("nric");
+
+            int caseIDInt = Integer.parseInt(caseID);
+
+            SearchCaseDAO scDao = new SearchCaseDAO();
+            ArrayList<SearchCase> caseList = scDao.searchCase(caseIDInt, nric);
         %>
-        </br>
-        <input type="button" onclick="history.go(-1);" value="Back">
+
+        <p class="title"><img src="img/case.png">Case ID: <% out.print(caseID);%></p>
+        <table class="no-fixed">
+            <thead>
+                <tr>
+                    <td colspan=4>Complainant Details</td>
+                </tr>
+            </thead>
+            <tr>
+                <td><b>Name</b></td>
+                <td><% out.println(caseList.get(0).getPersonName());%></td>
+                <td><b>Contact</b></td>
+                <td><% out.println(caseList.get(0).getContactNo());%></td>
+            </tr>
+            <tr>
+                <td><b>NRIC</b></td>
+                <td><% out.println(caseList.get(0).getPersonNric());%></td>
+                <td><b>Email</b></td>
+                <td><% out.println(caseList.get(0).getEmail());%></td>
+            </tr>
+        </table>
+
+        <table class="case-details">
+            <colgroup>
+                <col class="col-1">
+                <col class="col-2">
+                <col class="col-3">
+                <col class="col-4">
+            </colgroup>
+            <thead>
+                <tr>
+                    <td colspan=4>Case Details</td>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><b>Difficulty</b></td>
+                    <td><% out.println(caseList.get(0).getDifficulty());%></td>
+                    <td rowspan="2"><b>Description</b></td>
+                    <td rowspan="2"><% out.println(caseList.get(0).getDescription());%></td>
+                </tr>
+                <tr>
+                    <td><b>Issue</b></td>
+                    <td><% out.println(caseList.get(0).getIssue());%></td>
+                </tr>
+                <tr>
+                    <td><b>Additional Info Date</b></td>
+                    <td><% out.println(caseList.get(0).getAdditionalInfoDate());%></td>
+                    <td><b>Additional Info</b></td>
+                    <td><% out.println(caseList.get(0).getAdditionalInfo());%></td>
+                </tr>
+                <tr>
+                    <td><b>Status</b></td>
+                    <td><% out.println(caseList.get(0).getStatus());%></td>
+                    <td><b>Closing Remarks</b></td>
+                    <td><% out.println(caseList.get(0).getClosingRemark());%></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <%
+            CaseDAO caseDAO = new CaseDAO();
+            LinkedHashMap<Integer, ArrayList<String>> otherResponses = caseDAO.getCaseResponses(Integer.parseInt(caseID));
+        %>
+        <table class="case-details">
+            <colgroup>
+                <col class="col-1">
+                <col class="col-2">
+                <col class="col-3">
+                <col class="col-4">
+            </colgroup>
+            <thead>
+                <tr>
+                    <td colspan=4>Responses</td>
+                </tr>
+            </thead>
+            <%
+                if (otherResponses.size() > 0) {
+                    Set<Integer> keys = otherResponses.keySet();
+                    for (Integer k : keys) {
+                        ArrayList<String> arr = otherResponses.get(k);
+                        String name = arr.get(0);
+                        String[] nameArr = name.split(",");
+                        int size = arr.size() - 1;
+            %>
+            <tbody>
+                <tr>
+                    <td rowspan="<% out.println(size);%>"><b>Respondent</b></td>
+                    <td rowspan="<% out.println(size);%>">
+                        <% out.println(nameArr[0].trim());%><br>
+                        <% out.println("(" + nameArr[1].trim() + ")");%>
+                    </td>
+                    <% for (int i = 1; i < arr.size(); i += 2) {%>
+                    <td><b>Response Date</b></td>
+                    <td><% out.println(arr.get(i));%></td>
+                </tr>
+                <tr>
+                    <td><b>Response</b></td>
+                    <td><% out.println(arr.get(i + 1));%></td>
+                </tr>
+                <%
+                        }
+                    }
+                } else {%>
+                <tr>
+                    <td colspan="4" >
+                        <p style="text-align: center;">There are no responses.</p>
+                    </td>
+                </tr>
+                <%  } %>
+            </tbody>
+        </table>
+
+        <input class="back-btn" type="button" onclick="history.go(-1);" value="Back">
     </body>
 </html>

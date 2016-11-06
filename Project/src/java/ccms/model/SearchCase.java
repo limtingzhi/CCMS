@@ -18,10 +18,11 @@ public class SearchCase {
     private String description;
     private String difficulty;
     private String issue;
+    private String additional_info_date;
     private String additional_info;
     private String closing_remark;
     
-    public SearchCase(int id, String reportedDate, String personName, String personNric, int contactNo, String email, String type, String status, String description, String difficulty, String issue, String additional_info, String closing_remark){
+    public SearchCase(int id, String reportedDate, String personName, String personNric, int contactNo, String email, String type, String status, String description, String difficulty, String issue, String additional_info_date, String additional_info, String closing_remark){
         this.id = id;
         this.reportedDate = reportedDate;
         this.personName = personName;
@@ -33,6 +34,7 @@ public class SearchCase {
         this.description = description;
         this.difficulty = difficulty;
         this.issue = issue;
+        this.additional_info_date = additional_info_date;
         this.additional_info = additional_info;
         this.closing_remark = closing_remark;
     }
@@ -78,6 +80,10 @@ public class SearchCase {
     
     public String getIssue(){
         return issue;
+    }
+    
+    public String getAdditionalInfoDate() {
+        return additional_info_date;
     }
     
     public String getAdditionalInfo(){

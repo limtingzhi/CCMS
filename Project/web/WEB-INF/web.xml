@@ -16,6 +16,10 @@
         <servlet-name>ProcessAddInfo</servlet-name>
         <url-pattern>/ProcessAddInfo</url-pattern>
     </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>processCase</servlet-name>
+        <url-pattern>/processCase</url-pattern>
+    </servlet-mapping> 
     <session-config>
         <session-timeout>
             30

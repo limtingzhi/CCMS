@@ -40,16 +40,18 @@ import javax.servlet.http.HttpSession;
 public class CaseController extends HttpServlet {
 
     private CaseDAO caseDAO;
-    
+
     public CaseController() throws ParseException {
         DepartmentDAO dDAO = new DepartmentDAO();
         EmployeeDAO eDAO = new EmployeeDAO(dDAO);
         PersonDAO pDAO = new PersonDAO();
         this.caseDAO = new CaseDAO(eDAO, pDAO);
     }
+
     /**
-     * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
-     * methods.
+     * Processes requests for both HTTP
+     * <code>GET</code> and
+     * <code>POST</code> methods.
      *
      * @param request servlet request
      * @param response servlet response
@@ -63,13 +65,14 @@ public class CaseController extends HttpServlet {
         try {
             int caseID = Integer.parseInt(request.getParameter("caseID"));
 
-//            ArrayList<String> caseDetails = processCaseDetails(caseID);
-            ArrayList<String> caseDetails = caseDAO.getCaseDetails(caseID);
+//            ArrayList<String> caseDetails = caseDAO.getCaseDetails(caseID);
+            ArrayList<String> caseDetails = processCaseDetails(caseID);
+
             request.setAttribute("caseDetails", caseDetails);
-                       
+
             LinkedHashMap<Integer, ArrayList<String>> responses = caseDAO.getCaseResponses(caseID);
             request.setAttribute("responses", responses);
-            
+
             RequestDispatcher rd = request.getRequestDispatcher("RespondCase.jsp");
             rd.forward(request, response);
             return;
@@ -77,30 +80,30 @@ public class CaseController extends HttpServlet {
             out.close();
         }
     }
-    
-//    public ArrayList<String> processCaseDetails (int caseID) throws ParseException {
-//        SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-//        SimpleDateFormat sdf2 = new SimpleDateFormat("dd-MM-yyyy");
-//        ArrayList<String> caseDetails = caseDAO.getCaseDetails(caseID);
-//        String additional_info = caseDetails.get(6);
-//        if(additional_info == null) { 
-//            caseDetails.set(6,"N/A");
-//        }
-//        int lastIndex = caseDetails.size()-1;
-//        String addOnDate = caseDetails.get(lastIndex);
-//        if(addOnDate == null) {
-//            caseDetails.set(lastIndex, "");
-//        } else {
-//            Date d = sdf1.parse(addOnDate);
-//            caseDetails.set(lastIndex, "(added on " + sdf2.format(d) + ")");
-//        }
-//        return caseDetails;
-//    }
-    
+
+    public ArrayList<String> processCaseDetails(int caseID) throws ParseException {
+        SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+        SimpleDateFormat sdf2 = new SimpleDateFormat("dd/MM/yyyy hh:mm a");
+        ArrayList<String> caseDetails = caseDAO.getCaseDetails(caseID);
+        String additional_info = caseDetails.get(6);
+        if (additional_info == null) {
+            caseDetails.set(6, "-");
+        }
+        int lastIndex = caseDetails.size() - 1;
+        String addOnDate = caseDetails.get(lastIndex);
+        if (addOnDate == null) {
+            caseDetails.set(lastIndex, "-");
+        } else {
+            Date d = sdf1.parse(addOnDate);
+            caseDetails.set(lastIndex, sdf2.format(d));
+        }
+        return caseDetails;
+    }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**
-     * Handles the HTTP <code>GET</code> method.
+     * Handles the HTTP
+     * <code>GET</code> method.
      *
      * @param request servlet request
      * @param response servlet response
@@ -118,7 +121,8 @@ public class CaseController extends HttpServlet {
     }
 
     /**
-     * Handles the HTTP <code>POST</code> method.
+     * Handles the HTTP
+     * <code>POST</code> method.
      *
      * @param request servlet request
      * @param response servlet response
@@ -144,5 +148,4 @@ public class CaseController extends HttpServlet {
     public String getServletInfo() {
         return "Short description";
     }// </editor-fold>
-
 }
