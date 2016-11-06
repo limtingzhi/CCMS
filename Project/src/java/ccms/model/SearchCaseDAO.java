@@ -134,7 +134,7 @@ public class SearchCaseDAO {
                 ps.setInt(1, caseID);
                 ps.setString(2, nric);
                 rs = ps.executeQuery();
-            } else if (caseID > 0 && !nric.contains("empty")) {
+            } else if (caseID > 0 && nric.contains("empty")) {
                 SEARCH_CASE = SEARCH_CASE_2;
                 ps = con.prepareStatement(SEARCH_CASE);
                 ps.setInt(1, caseID);
