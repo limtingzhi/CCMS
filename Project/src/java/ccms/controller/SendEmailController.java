@@ -3,7 +3,6 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package ccms.controller;
 
 import java.io.IOException;
@@ -47,7 +46,7 @@ public class SendEmailController extends HttpServlet {
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
-            out.println("<title>Servlet SendEmailServlet</title>");            
+            out.println("<title>Servlet SendEmailServlet</title>");
             out.println("</head>");
             out.println("<body>");
             out.println("<h1>Servlet SendEmailServlet at " + request.getContextPath() + "</h1>");
@@ -70,7 +69,7 @@ public class SendEmailController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-      processRequest(request, response);
+        processRequest(request, response);
     }
 
     /**
@@ -84,79 +83,79 @@ public class SendEmailController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
-        //String emailaddress = request.getParameter("email");
-        String caseid = request.getParameter("caseid");
-        
-        final String username = "ccms.mom.noreply@gmail.com";
-		final String password = "helloworld01";
-        // Recipient's email ID needs to be mentioned.
-      String to = "chuafengru@gmail.com";
- 
-      // Sender's email ID needs to be mentioned
-      String from = "ccms.mom.noreply@gmail.com";
- 
-      // Assuming you are sending email from localhost
-      String host = "localhost";
- 
-      // Get system properties
-      Properties props = System.getProperties();
- 
-      // Setup mail server
-		props.put("mail.smtp.auth", "true");
-		props.put("mail.smtp.starttls.enable", "true");
-		props.put("mail.smtp.host", "smtp.gmail.com");
-		props.put("mail.smtp.port", "587");
- 
-      // Get the default Session object.
-      //Session session = Session.getDefaultInstance(props);
-      Session session = Session.getInstance(props,
-		  new javax.mail.Authenticator() {
-                        @Override
-			protected PasswordAuthentication getPasswordAuthentication() {
-				return new PasswordAuthentication(username, password);
-			}
-		  });
-      
-	  // Set response content type
-      response.setContentType("text/html");
-      PrintWriter out = response.getWriter();
 
-      try{
-         // Create a default MimeMessage object.
-         MimeMessage message = new MimeMessage(session);
-         // Set From: header field of the header.
-         message.setFrom(new InternetAddress(from));
-         // Set To: header field of the header.
-         message.addRecipient(Message.RecipientType.TO,
-                                  new InternetAddress(to));
-         // Set Subject: header field
-         message.setSubject("Thank you for your complaint/compliment");
-         // Now set the actual message
-         message.setText("We have received your complaint/compliment. \n"
-                 + "We will get back to you in 7 working days. \n"
-                 + "Thank you. \n"
-                 + "\n"
-                 + "MOM CCMS Auto-generated Email. Do not reply.");
-         // Send message
-         Transport.send(message);
-         String title = "Feedback has been successfully logged.";
-         String res = "Acknowledgement email has been sent to user.";
-         String docType =
-         "<!doctype html public \"-//w3c//dtd html 4.0 " +
-         "transitional//en\">\n";
-         out.println(docType +
-         "<html>\n" +
-         "<head><title>" + title + "</title></head>\n" +
-         "<body bgcolor=\"#f0f0f0\">\n" +
-         "<h1 align=\"center\">" + title + "</h1>\n" +
-         "<p align=\"center\">" + res + "</p>\n" +
-         "</body></html>");
-         response.sendRedirect("Home.jsp");
-      }catch (MessagingException mex) {
-         mex.printStackTrace();
-      }
-      //processRequest(request, response);
+        String emailaddress = request.getParameter("email");
+        String caseid = request.getParameter("caseid");
+
+        final String username = "ccms.mom.noreply@gmail.com";
+        final String password = "helloworld01";
+        // Recipient's email ID needs to be mentioned.
+        String to = emailaddress;
+
+        // Sender's email ID needs to be mentioned
+        String from = "ccms.mom.noreply@gmail.com";
+
+        // Assuming you are sending email from localhost
+        String host = "localhost";
+
+        // Get system properties
+        Properties props = System.getProperties();
+
+        // Setup mail server
+        props.put("mail.smtp.auth", "true");
+        props.put("mail.smtp.starttls.enable", "true");
+        props.put("mail.smtp.host", "smtp.gmail.com");
+        props.put("mail.smtp.port", "587");
+
+      // Get the default Session object.
+        //Session session = Session.getDefaultInstance(props);
+        Session session = Session.getInstance(props,
+                new javax.mail.Authenticator() {
+                    @Override
+                    protected PasswordAuthentication getPasswordAuthentication() {
+                        return new PasswordAuthentication(username, password);
+                    }
+                });
+
+        // Set response content type
+        response.setContentType("text/html");
+        PrintWriter out = response.getWriter();
+
+        try {
+            // Create a default MimeMessage object.
+            MimeMessage message = new MimeMessage(session);
+            // Set From: header field of the header.
+            message.setFrom(new InternetAddress(from));
+            // Set To: header field of the header.
+            message.addRecipient(Message.RecipientType.TO,
+                    new InternetAddress(to));
+            // Set Subject: header field
+            message.setSubject("Thank you for your complaint/compliment");
+            // Now set the actual message
+            message.setText("We have received your complaint/compliment. \n"
+                    + "We will get back to you in 7 working days. \n"
+                    + "Thank you. \n"
+                    + "\n"
+                    + "MOM CCMS Auto-generated Email. Do not reply.");
+            // Send message
+            Transport.send(message);
+            String title = "Feedback has been successfully logged.";
+            String res = "Acknowledgement email has been sent to user.";
+            String docType
+                    = "<!doctype html public \"-//w3c//dtd html 4.0 "
+                    + "transitional//en\">\n";
+            out.println(docType
+                    + "<html>\n"
+                    + "<head><title>" + title + "</title></head>\n"
+                    + "<body bgcolor=\"#f0f0f0\">\n"
+                    + "<h1 align=\"center\">" + title + "</h1>\n"
+                    + "<p align=\"center\">" + res + "</p>\n"
+                    + "</body></html>");
+            response.sendRedirect("Home.jsp");
+        } catch (MessagingException mex) {
+            mex.printStackTrace();
+        }
+        //processRequest(request, response);
     }
 
     /**

@@ -37,7 +37,7 @@
                 <div id="features-header">Features</div>
             </div>
             <div id="features-div">
-                <a class="features" href="Home.jsp">
+                <a class="features" href="CreateCase.jsp">
                     <img src="img/create.png"><br>
                     Create</a>
                 <a class="features" href="ListOfCases.jsp">

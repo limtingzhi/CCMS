@@ -22,18 +22,25 @@
 %>
 <html>
     <head>
+        <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+        <script type="text/javascript" src="js/main.js"></script>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>Search Case</title>
     </head>
     <body>
-        <p><b>Search Case:</b></p>
+        </br>
+        <p style="border-bottom: 1px dotted #000000;">General Search</p>
+        </br>
+
+        <div id="search_div" align="center">
+            <label for="wildcardsearch" class="control-label col-xs-2">Wild Card Search: </label>
+            <input class="search_input" type="text" id="search" placeholder="Search"/>
+            <a class="tooltipped tooltipped_circle" data-position="top" data-delay="50" data-tooltip=""></a>   
+        </div>
+        <br></br>
+        <p style="border-bottom: 1px dotted #000000;">Advanced Search</p>
+        </br>
         <form class="form-horizontal" align="center" name="login_form" method="post" action="SearchCase.do">
-            <div class="form-group">
-                <label for="caseid" class="control-label col-xs-2">Person's Name:</label>
-                <div class="col-xs-10">
-                    <input type="text" class="form-control" id="caseid" name="personname">
-                </div>
-            </div>
             <div class="form-group">
                 <label for="caseid" class="control-label col-xs-2">Person's NRIC:</label>
                 <div class="col-xs-10">
@@ -54,7 +61,7 @@
                 </div>
             </div>
         </form>
-        <br></br>
+
         <p> Search Result: </p>
 
         <%
@@ -64,7 +71,7 @@
             }
         %>
 
-        <table border="1" align="center">
+        <table id="datatable" border="1" align="center">
             <thead>
             <th>Case ID</th>
             <th>Reported Date</th>
@@ -89,15 +96,15 @@
                     out.println("<td>" + case1.getStatus() + "</td>");
                     if (case1.getStatus().equals("Closed")) {
                         out.println("<td><a href=SearchViewCase.jsp?caseid=" + case1.getID() + "&nric=" + case1.getPersonNric() + ">View Case</a> | Add Information | Archive </td>");
-                    }else{
+                    } else {
                         out.println("<td><a href=SearchViewCase.jsp?caseid=" + case1.getID() + "&nric=" + case1.getPersonNric() + ">View Case</a> | <a href=AddInfo.jsp?caseid=" + case1.getID() + "&nric=" + case1.getPersonNric() + ">Add Information</a> | <a href=ArchiveCase.jsp?caseid=" + case1.getID() + "&nric=" + case1.getPersonNric() + ">Archive</a></td>");
                     }
-                    
+
                     out.println("</tr>");
                 }
 
                 //if (count == 0) {
-                  //  out.println("<tr> <td colspan=7 align=center> No records found.</tr>");
+                //  out.println("<tr> <td colspan=7 align=center> No records found.</tr>");
                 //}
             } else {
                 out.println("<tr> <td colspan=7 align=center> No records found.</tr>");
