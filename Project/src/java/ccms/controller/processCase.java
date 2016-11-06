@@ -40,9 +40,9 @@ public class processCase extends HttpServlet {
         PersonDAO pdao = new PersonDAO();
         HttpSession sess = request.getSession();
         PrintWriter out = response.getWriter();
-        int caseID =0 ;
+        int caseID = 0;
         String difficultyToPassToACA = "";
-        
+
         try {
             CaseDAO casedao = new CaseDAO();
             //type of the case
@@ -74,57 +74,53 @@ public class processCase extends HttpServlet {
             } else {
 
                 pdao.createPerson(new Person(person_nric, person_name, person_email, Integer.parseInt(person_contact)));
-                out.println("type is" + type[0]);
+
                 if (type.length > 1) {
                     //create case for complaint
                     String caseType = "complaint";
                     casedao.createCase(new complaintCase(complaintDescription, reported_date, caseType, recorded_employee_id, person_nric));
                     casedao.createComplaintCase(new complaintCase(difficulty, issues));
                     request.setAttribute("email", person_email);
-                    
-                    //RequestDispatcher dispatcher = request.getRequestDispatcher("/SendEmail.do");
-                    //dispatcher.forward(request, response);
-                    
                     caseID = casedao.getLatestCaseID();
-                    String caseIDToPassToACA = caseID+"";
+                    String caseIDToPassToACA = caseID + "";
                     request.setAttribute("difficultyToACA", difficultyToPassToACA);
                     request.setAttribute("caseIDToACA", caseIDToPassToACA);
                     RequestDispatcher dispatcher = request.getRequestDispatcher("/AutoCaseAllocation");
                     dispatcher.forward(request, response);
-                    
-                    out.println("you did reach the email part");
 
                     //create case for compliment
                     caseType = "compliment";
                     casedao.createCase(new complaintCase(complimentDescription, reported_date, caseType, recorded_employee_id, person_nric));
                     casedao.createComplimentCase(new complimentCase(empName, deptName));
                     casedao.createEmployeeComplimentCase(new complimentCase(empName, deptName));
+                    request.setAttribute("email", person_email);
+                    dispatcher = request.getRequestDispatcher("/ResponseEmail.do");
+                    dispatcher.forward(request, response);
 
                 } else if (type[0].equals("complaint")) {
                     String caseType = "complaint";
                     casedao.createCase(new complaintCase(complaintDescription, reported_date, caseType, recorded_employee_id, person_nric));
                     casedao.createComplaintCase(new complaintCase(difficulty, issues));
                     request.setAttribute("email", person_email);
-                    //RequestDispatcher dispatcher = request.getRequestDispatcher("/SendEmail.do");
-                    //dispatcher.forward(request, response);
-                    
+
                     caseID = casedao.getLatestCaseID();
-                    String caseIDToPassToACA = caseID+"";
+                    String caseIDToPassToACA = caseID + "";
                     request.setAttribute("difficultyToACA", difficultyToPassToACA);
                     request.setAttribute("caseIDToACA", caseIDToPassToACA);
                     RequestDispatcher dispatcher = request.getRequestDispatcher("/AutoCaseAllocation");
                     dispatcher.forward(request, response);
-                    
-                    out.println("you did reach the email part");
 
                 } else {
                     String caseType = "compliment";
                     casedao.createCase(new complaintCase(complimentDescription, reported_date, caseType, recorded_employee_id, person_nric));
                     casedao.createComplimentCase(new complimentCase(empName, deptName));
                     casedao.createEmployeeComplimentCase(new complimentCase(empName, deptName));
+                    request.setAttribute("email", person_email);
+                    RequestDispatcher dispatcher = request.getRequestDispatcher("/ResponseEmail.do");
+                    dispatcher.forward(request, response);
                 }
             }
-          
+
         } catch (Exception e) {
 
         } finally {
