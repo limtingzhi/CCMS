@@ -11,10 +11,29 @@ import java.util.*;
 
 public class SearchCaseDAO {
 
-    private static final String GET_ALL_CASE = "select c.case_id, c.reported_date, p.name, p.nric, p.contact_no, p.email, c.type, cc.status, c.description, cc.difficulty, cc.issue, cc.add_on_date, cc.additional_info, cc.closing_remark from person p, cases c, complaint_case cc where p.nric = c.person_nric and c.case_id = cc.complaint_case_id";
-    private static final String SEARCH_CASE = "select c.case_id, c.reported_date, p.name, p.nric, p.contact_no, p.email, c.type, cc.status, c.description, cc.difficulty, cc.issue, cc.add_on_date, cc.additional_info, cc.closing_remark from person p, cases c, complaint_case cc where p.nric = c.person_nric and c.case_id = cc.complaint_case_id AND \n"
+    private static final String GET_ALL_CASE = "SELECT c.case_id, c.reported_date, p.name, p.nric, p.contact_no, p.email, c.type, cc.status, c.description, cc.difficulty, cc.issue, cc.add_on_date, cc.additional_info, cc.closing_remark\n" +
+"FROM cases c\n" +
+"LEFT JOIN person p ON p.nric = c.person_nric\n" +
+"LEFT JOIN complaint_case cc ON c.case_id = cc.complaint_case_id\n" +
+"ORDER BY c.case_id DESC";
+    private static final String SEARCH_CASE_1 = "SELECT c.case_id, c.reported_date, p.name, p.nric, p.contact_no, p.email, c.type, cc.status, c.description, cc.difficulty, cc.issue, cc.add_on_date, cc.additional_info, cc.closing_remark\n" +
+"FROM cases c\n" +
+"LEFT JOIN person p ON p.nric = c.person_nric\n" +
+"LEFT JOIN complaint_case cc ON c.case_id = cc.complaint_case_id WHERE \n"
+            + "c.case_id=? AND p.nric=? ORDER BY c.case_id DESC";
+    private static final String SEARCH_CASE_2 = "SELECT c.case_id, c.reported_date, p.name, p.nric, p.contact_no, p.email, c.type, cc.status, c.description, cc.difficulty, cc.issue, cc.add_on_date, cc.additional_info, cc.closing_remark\n" +
+"FROM cases c\n" +
+"LEFT JOIN person p ON p.nric = c.person_nric\n" +
+"LEFT JOIN complaint_case cc ON c.case_id = cc.complaint_case_id WHERE \n"
+            + "c.case_id=? ORDER BY c.case_id DESC";
+    private static final String SEARCH_CASE_3 = "SELECT c.case_id, c.reported_date, p.name, p.nric, p.contact_no, p.email, c.type, cc.status, c.description, cc.difficulty, cc.issue, cc.add_on_date, cc.additional_info, cc.closing_remark\n" +
+"FROM cases c\n" +
+"LEFT JOIN person p ON p.nric = c.person_nric\n" +
+"LEFT JOIN complaint_case cc ON c.case_id = cc.complaint_case_id WHERE \n"
+            + "p.nric=? ORDER BY c.case_id DESC";
+    private static final String SHOW_COMPLAINT_CASE = "select c.case_id, c.reported_date, p.name, p.nric, p.contact_no, p.email, c.type, cc.status, c.description, cc.difficulty, cc.issue, cc.add_on_date, cc.additional_info, cc.closing_remark from person p, cases c, complaint_case cc where p.nric = c.person_nric and c.case_id = cc.complaint_case_id AND \n"
             + "c.case_id=? AND p.nric=?";
-    private static final String SHOW_CASE = "select c.case_id, c.reported_date, p.name, p.nric, p.contact_no, p.email, c.type, cc.status, c.description, cc.difficulty, cc.issue, cc.add_on_date, cc.additional_info, cc.closing_remark from person p, cases c, complaint_case cc where p.nric = c.person_nric and c.case_id = cc.complaint_case_id AND \n"
+    private static final String SHOW_COMPLIMENT_CASE = "select c.case_id, c.reported_date, p.name, p.nric, p.contact_no, p.email, c.description, d.name as dname, e.name from person p, cases c, compliment_case cc, department d, employee_compliment_case ecc, employee e where p.nric = c.person_nric and c.case_id = cc.compliment_case_id and d.dept_id=cc.compliment_dept and ecc.compliment_case_id=c.case_id and ecc.employee_id=e.employee_id AND \n"
             + "c.case_id=? AND p.nric=?";
     private static final String ADD_INFO = "update ccms_db.complaint_case SET additional_info = ?, add_on_date = CAST(? AS DATETIME), status = (SELECT concat('Pending - ', e.position) FROM complaint_case_handling ch, employee e WHERE e.employee_id = ch.employee_id AND ch.complaint_case_id = ? HAVING MAX(received_date)) WHERE \n"
             + "complaint_case_id=?";
@@ -104,13 +123,28 @@ public class SearchCaseDAO {
         Connection con = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
-
+        String SEARCH_CASE = SEARCH_CASE_1;
+        
         try {
             con = ConnectionManager.getConnection();
-            ps = con.prepareStatement(SEARCH_CASE);
-            ps.setInt(1, caseID);
-            ps.setString(2, nric);
-            rs = ps.executeQuery();
+            
+            if (caseID != 0 && !nric.contains("empty")) {
+                SEARCH_CASE = SEARCH_CASE_1;
+                ps = con.prepareStatement(SEARCH_CASE);
+                ps.setInt(1, caseID);
+                ps.setString(2, nric);
+                rs = ps.executeQuery();
+            } else if (caseID > 0 && !nric.contains("empty")) {
+                SEARCH_CASE = SEARCH_CASE_2;
+                ps = con.prepareStatement(SEARCH_CASE);
+                ps.setInt(1, caseID);
+                rs = ps.executeQuery();
+            } else {
+                SEARCH_CASE = SEARCH_CASE_3;
+                ps = con.prepareStatement(SEARCH_CASE);
+                ps.setString(1, nric);
+                rs = ps.executeQuery();
+            }
 
             while (rs.next()) {
                 String addOnDate = "-";
@@ -182,7 +216,7 @@ public class SearchCaseDAO {
 
         try {
             con = ConnectionManager.getConnection();
-            ps = con.prepareStatement(SHOW_CASE);
+            ps = con.prepareStatement(SHOW_COMPLAINT_CASE);
             ps.setInt(1, caseID);
             ps.setString(2, nric);
             rs = ps.executeQuery();
@@ -246,6 +280,50 @@ public class SearchCaseDAO {
             }
         }
         return caseList;
+    }
+    
+    public String showComplimentCase(int caseID, String nric) {
+       
+        Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        String result = "";
+        try {
+            con = ConnectionManager.getConnection();
+            ps = con.prepareStatement(SHOW_COMPLIMENT_CASE);
+            ps.setInt(1, caseID);
+            ps.setString(2, nric);
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+                result = rs.getInt("case_id")+","+rs.getTimestamp("reported_date")+","+rs.getString("name")+","+rs.getInt("contact_no")+","+rs.getString("email")+","+rs.getString("description")+","+rs.getString("dname")+","+rs.getString("name")+"";
+            }
+        } catch (SQLException se) {
+            se.printStackTrace();
+        } finally {
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            if (ps != null) {
+                try {
+                    ps.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            if (con != null) {
+                try {
+                    con.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return result;
     }
 
     public boolean addInfo(String addInfo, int caseID, String todayDate) {
