@@ -94,7 +94,7 @@ public class processCase extends HttpServlet {
                     casedao.createComplimentCase(new complimentCase(empName, deptName));
                     casedao.createEmployeeComplimentCase(new complimentCase(empName, deptName));
                     request.setAttribute("email", person_email);
-                    dispatcher = request.getRequestDispatcher("/ResponseEmail.do");
+                    dispatcher = request.getRequestDispatcher("/SendEmail.do");
                     dispatcher.forward(request, response);
 
                 } else if (type[0].equals("complaint")) {
@@ -116,7 +116,7 @@ public class processCase extends HttpServlet {
                     casedao.createComplimentCase(new complimentCase(empName, deptName));
                     casedao.createEmployeeComplimentCase(new complimentCase(empName, deptName));
                     request.setAttribute("email", person_email);
-                    RequestDispatcher dispatcher = request.getRequestDispatcher("/ResponseEmail.do");
+                    RequestDispatcher dispatcher = request.getRequestDispatcher("/SendEmail.do");
                     dispatcher.forward(request, response);
                 }
             }
