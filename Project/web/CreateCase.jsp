@@ -29,6 +29,12 @@
                 </tr>
 
                 <tr><td><h3>Case Information</h3></td></tr>
+                <%
+                    String errorMessage = (String) session.getAttribute("Error");
+                    if (errorMessage != null) {
+                        out.println("<font color='red'>" + errorMessage + "</font>");
+                    }
+                %>
                 <tr> <td>
                         <input type="checkbox" name="type" value="complaint">Complaint <br>
                     </td>
@@ -85,7 +91,7 @@
                             statement = con.createStatement();
 
                             rs = statement.executeQuery("select name from department");
-                            
+
                         %>
                         Department: <select name="employee_dept">
                             <%  while (rs.next()) {%>
