@@ -28,18 +28,19 @@ public class CaseDAO {
     private static final String AUTO_UPDATE_CASE_2_WEEKS = "UPDATE complaint_case SET status = 'Closed' WHERE complaint_case_id IN (SELECT complaint_case_id FROM (SELECT complaint_case_id, MAX(response_date) AS response_date FROM complaint_case_handling WHERE response_date IS NOT NULL GROUP BY complaint_case_id HAVING DATEDIFF(NOW(), response_date) > 14) as temp)";
     private static final String GET_OUTSTANDING_CASES = "SELECT c.reported_date, cc.issue, cc.difficulty, cc.add_on_date, ch.complaint_case_id, ch.employee_id, MAX(received_date) AS received, ch.response, ch.last_saved FROM cases c, complaint_case_handling ch, complaint_case cc WHERE c.case_id = cc.complaint_case_id AND cc.complaint_case_id = ch.complaint_case_id AND ch.response_date IS NULL GROUP BY ch.complaint_case_id";
     private static final String GET_REPORTEDDATE_BY_CASE_ID = "SELECT c.reported_date FROM cases c WHERE c.case_id = ?";
-    private static final String GET_DIFFICULTY_BY_EMPID = "SELECT cc.difficulty\n" +
-        "FROM complaint_case cc, complaint_case_handling cch\n" +
-        "WHERE cc.complaint_case_id = cch.complaint_case_id\n" +
-        "AND cch.employee_id =?";
-    private static final String UPDATE_COMPLAINT_CASE = "UPDATE complaint_case\n" +
-        "SET status=?\n" +
-        "WHERE complaint_case_id=?";
-    private static final String INSERT_COMPLAINT_CASE_HANDLING = "INSERT INTO complaint_case_handling\n" +
-        "VALUES (?,?,?,NULL,NULL,NULL)\n";
+    private static final String GET_DIFFICULTY_BY_EMPID = "SELECT cc.difficulty\n"
+            + "FROM complaint_case cc, complaint_case_handling cch\n"
+            + "WHERE cc.complaint_case_id = cch.complaint_case_id\n"
+            + "AND cch.employee_id =?";
+    private static final String UPDATE_COMPLAINT_CASE = "UPDATE complaint_case\n"
+            + "SET status=?\n"
+            + "WHERE complaint_case_id=?";
+    private static final String INSERT_COMPLAINT_CASE_HANDLING = "INSERT INTO complaint_case_handling\n"
+            + "VALUES (?,?,?,NULL,NULL,NULL)\n";
     private static final String INSERT_NEW_CASE = "INSERT INTO cases (description, reported_date, type, recorded_employee_id, person_nric) VALUES (?,CAST(? AS DATETIME),?,?,?)";
     private static final String INSERT_COMPLAINT_CASE = "INSERT INTO complaint_case (complaint_case_id, difficulty, issue, status, add_on_date, additional_info, closing_remark) VALUES (?,?,?,?,?,?,?)";
-    private static final String INSERT_COMPLIMENT_CASE = "INSERT INTO compliment_case (complaint_case_id, dept) VALUES (?,?)";
+    private static final String INSERT_COMPLIMENT_CASE = "INSERT INTO compliment_case (compliment_case_id, compliment_dept) VALUES (?,?)";
+    private static final String INSERT_EMPLOYEECOMPLIMENT_CASE = "INSERT INTO employee_compliment_case (compliment_case_id, employee_id) VALUES (?,?)";
 
     public CaseDAO() throws ParseException {
         autoUpdateCaseStatus();
@@ -533,7 +534,7 @@ public class CaseDAO {
         expectedDate = sdf2.format(cal.getTime());
         return expectedDate;
     }
-    
+
     public Timestamp getReportedDateOfCase(int caseID) throws ParseException {
 
         Connection con = null;
@@ -545,7 +546,6 @@ public class CaseDAO {
             ps = con.prepareStatement(GET_REPORTEDDATE_BY_CASE_ID);
             ps.setInt(1, caseID);
             rs = ps.executeQuery();
-            
 
             while (rs.next()) {
                 reportedDate = rs.getTimestamp("reported_date");
@@ -577,10 +577,9 @@ public class CaseDAO {
         }
         return reportedDate;
     }
-    
+
     public int getWorkloadByEmpID(int empID) throws ParseException {
-        
-        
+
         Connection con = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
@@ -590,24 +589,24 @@ public class CaseDAO {
             ps = con.prepareStatement(GET_DIFFICULTY_BY_EMPID);
             ps.setInt(1, empID);
             rs = ps.executeQuery();
-            
+
             int easy = 0;
             int hard = 0;
             int scomplex = 0;
-                    
+
             while (rs.next()) {
                 String difficulty = rs.getString("difficulty");
                 if (difficulty.equalsIgnoreCase("Easy")) {
                     easy++;
-                }else if (difficulty.equalsIgnoreCase("Hard")){
+                } else if (difficulty.equalsIgnoreCase("Hard")) {
                     hard++;
-                }else{
+                } else {
                     scomplex++;
                 }
             }
-            
-            overallWorkLoad = (easy*3)+(hard*5)+(scomplex*7);
-            
+
+            overallWorkLoad = (easy * 3) + (hard * 5) + (scomplex * 7);
+
         } catch (SQLException se) {
             se.printStackTrace();
         } finally {
@@ -635,7 +634,7 @@ public class CaseDAO {
         }
         return overallWorkLoad;
     }
-    
+
     public int updateComplaintCase(String status, int caseID) {
         Connection con = null;
         PreparedStatement ps = null;
@@ -666,7 +665,7 @@ public class CaseDAO {
         }
         return rowUpdate;
     }
-    
+
     public int insertComplaintCaseHandling(int caseID, int empID) {
         Date received_date = new java.sql.Date(Calendar.getInstance().getTimeInMillis());
         Connection con = null;
@@ -699,7 +698,7 @@ public class CaseDAO {
         }
         return rowUpdate;
     }
-    
+
     public int createCase(complaintCase c) {
         Connection con = null;
         PreparedStatement ps = null;
@@ -776,21 +775,68 @@ public class CaseDAO {
         return rowUpdate;
     }
 
-    public int createComplimentCase(int dept) {
+    public int createComplimentCase(complimentCase cc) {
         Connection con = null;
         PreparedStatement ps = null;
         Statement stmt = null;
         ResultSet rs = null;
+        ResultSet rs2 = null;
 
         int rowUpdate = 0;
         try {
             con = ConnectionManager.getConnection();
             stmt = con.createStatement();
-            rs = stmt.executeQuery("SELECT case_id FROM cases ORDER BY case_id DESC LIMIT 1 where type = compliment");
             ps = con.prepareStatement(INSERT_COMPLIMENT_CASE);
+            rs = stmt.executeQuery("SELECT case_id FROM cases where type = 'compliment' ORDER BY case_id DESC LIMIT 1");
             rs.next();
-            ps.setString(1, rs.getString(1));
-            ps.setInt(2, dept);
+            int caseID = Integer.parseInt(rs.getString(1));
+            ps.setInt(1, caseID);
+            rs = stmt.executeQuery("SELECT dept_id FROM department where name = '" + cc.getDepartment_name()+"'");
+            rs.next();
+            int deptID = Integer.parseInt(rs.getString(1));
+            ps.setInt(2, deptID);
+            rowUpdate = ps.executeUpdate();
+        } catch (SQLException se) {
+            se.printStackTrace();
+        } finally {
+            if (ps != null) {
+                try {
+                    ps.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            if (con != null) {
+                try {
+                    con.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return rowUpdate;
+    }
+
+    public int createEmployeeComplimentCase(complimentCase cc) {
+        Connection con = null;
+        PreparedStatement ps = null;
+        Statement stmt = null;
+        ResultSet rs = null;
+        ResultSet rs2 = null;
+
+        int rowUpdate = 0;
+        try {
+            con = ConnectionManager.getConnection();
+            stmt = con.createStatement();
+            ps = con.prepareStatement(INSERT_EMPLOYEECOMPLIMENT_CASE);
+            rs = stmt.executeQuery("SELECT case_id FROM cases where type = 'compliment' ORDER BY case_id DESC LIMIT 1");
+            rs.next();
+            int caseID = Integer.parseInt(rs.getString(1));
+            ps.setInt(1, caseID);
+            rs2 = stmt.executeQuery("SELECT employee_id FROM employee where name = '" + cc.getEmployee_name() + "'");
+            rs2.next();
+            int empID = Integer.parseInt(rs2.getString(1));
+            ps.setInt(2, empID);
             rowUpdate = ps.executeUpdate();
         } catch (SQLException se) {
             se.printStackTrace();

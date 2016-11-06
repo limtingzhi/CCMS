@@ -5,11 +5,7 @@ package ccms.controller;
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-import ccms.model.CaseDAO;
-import ccms.model.Employee;
-import ccms.model.Person;
-import ccms.model.complaintCase;
-import ccms.model.PersonDAO;
+import ccms.model.*;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.Date;
@@ -48,21 +44,50 @@ public class processCase extends HttpServlet {
             String person_name = request.getParameter("person_name");
             String person_email = request.getParameter("person_email");
             String person_contact = request.getParameter("person_contact_no");
-            String description = request.getParameter("description");
             Date reported_date = new java.sql.Date(Calendar.getInstance().getTimeInMillis());
-            String type = request.getParameter("type");
+            String[] type = request.getParameterValues("type");
             int recorded_employee_id = Integer.parseInt(request.getParameter("recorded_employee_id"));//take in from session
             pdao.createPerson(new Person(person_nric, person_name, person_email, Integer.parseInt(person_contact)));
-            if (type.equals("complaint")) {
+            
+            if (type.length > 1) {
+                //create case for complaint
+                String caseType = "complaint";
+                String complaintDescription = request.getParameter("complaintDescription");
                 String difficulty = request.getParameter("difficulty");
                 String issues = request.getParameter("issues");
-                casedao.createCase(new complaintCase(description, reported_date, type, recorded_employee_id, person_nric, difficulty, issues));
+                casedao.createCase(new complaintCase(complaintDescription, reported_date, caseType, recorded_employee_id, person_nric));
                 casedao.createComplaintCase(new complaintCase(difficulty, issues));
+
+                //create case for compliment
+                String empName = request.getParameter("employee_name");
+                String deptName = request.getParameter("employee_dept");
+                caseType = "compliment";
+                String complimentDescription = request.getParameter("complimentDescription");
+                casedao.createCase(new complaintCase(complimentDescription, reported_date, caseType, recorded_employee_id, person_nric));
+                casedao.createComplimentCase(new complimentCase(empName,deptName));
+                casedao.createEmployeeComplimentCase(new complimentCase(empName,deptName));
+                
+            } else if (type[0].equals("complaint")) {
+                String caseType = "complaint";
+                String description = request.getParameter("complaintDescription");
+                String difficulty = request.getParameter("difficulty");
+                String issues = request.getParameter("issues");
+                casedao.createCase(new complaintCase(description, reported_date, caseType, recorded_employee_id, person_nric));
+                casedao.createComplaintCase(new complaintCase(difficulty, issues));
+                
+            } else if (type[0].equals("compliment")) {
+                String empName = request.getParameter("employee_name");
+                String deptName = request.getParameter("employee_dept");
+                String caseType = "compliment";
+                out.println(deptName + empName + type[0]);
+                String description = request.getParameter("complimentDescription");
+                casedao.createCase(new complaintCase(description, reported_date, caseType, recorded_employee_id, person_nric));
+                casedao.createComplimentCase(new complimentCase(empName,deptName));
+                casedao.createEmployeeComplimentCase(new complimentCase(empName,deptName));
             } else {
-                String employee = request.getParameter("employee_name");
-                int dept = Integer.parseInt(request.getParameter("employee_dept"));
-                casedao.createComplimentCase(dept);
+                //return error
             }
+
             //for multiple case, make sure u have a concat the 3 case difficulty
 
             /*request.setAttribute("email", person_email);

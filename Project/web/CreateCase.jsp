@@ -48,7 +48,7 @@
                 </tr>
                 <tr>
                     <td>Description:<br/>
-                        <textarea name="description" rows="10" cols="70"></textarea>
+                        <textarea name="complaintDescription" rows="10" cols="70"></textarea>
                     </td>
                 </tr>
 
@@ -85,9 +85,9 @@
                             statement = con.createStatement();
 
                             rs = statement.executeQuery("select name from department");
-
+                            
                         %>
-                        Department: <select name="department">
+                        Department: <select name="employee_dept">
                             <%  while (rs.next()) {%>
                             <option><%= rs.getString(1)%></option>
                             <% }
@@ -103,7 +103,7 @@
                 %>
                 <tr>
                     <td>Description:<br/>
-                        <textarea name="description" rows="10" cols="70"></textarea>
+                        <textarea name="complimentDescription" rows="10" cols="70"></textarea>
                     </td>
                 </tr>
                 <tr><td><input type="submit" value="Create"/><button><a href="Home.jsp">Cancel</a></button><td/><tr/>

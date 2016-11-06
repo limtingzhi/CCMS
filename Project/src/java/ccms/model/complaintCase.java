@@ -21,14 +21,12 @@ public class complaintCase {
     private String difficulty;
     private String issues;
 
-    public complaintCase(String description, Date reported_date, String type, int recorded_employee_id, String person_nric, String difficulty, String issues) {
+    public complaintCase(String description, Date reported_date, String type, int recorded_employee_id, String person_nric) {
         this.description = description;
         this.reported_date = reported_date;
         this.type = type;
         this.recorded_employee_id = recorded_employee_id;
         this.person_nric = person_nric;
-        this.difficulty = difficulty;
-        this.issues = issues;
     }
 
     public complaintCase(String difficulty, String issues) {
