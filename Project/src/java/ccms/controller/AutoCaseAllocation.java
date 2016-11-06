@@ -16,6 +16,7 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -42,8 +43,8 @@ public class AutoCaseAllocation extends HttpServlet {
             throws ServletException, IOException {
 
         //String caseToBeAllocated = request.getParameter("listOfCaseID");
-        String caseToBeAllocated = "5,6";
-        String caseDifficulty = "hard,hard";
+        String caseToBeAllocated = (String) request.getAttribute("caseIDToACA");
+        String caseDifficulty = (String) request.getAttribute("difficultyToACA");
 
         List<String> caseDifficultyList = Arrays.asList(caseDifficulty.split(","));
         List<String> caseToBeAllocatedList = Arrays.asList(caseToBeAllocated.split(","));
@@ -136,7 +137,9 @@ public class AutoCaseAllocation extends HttpServlet {
             int rowInserted = caseDao.insertComplaintCaseHandling(caseIDInt, bestEmp.getEmployeeID());
 
         }
-
+        
+        RequestDispatcher dispatcher = request.getRequestDispatcher("Home.jsp");
+        dispatcher.forward(request, response);
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">

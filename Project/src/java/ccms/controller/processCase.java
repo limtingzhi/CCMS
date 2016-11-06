@@ -38,6 +38,8 @@ public class processCase extends HttpServlet {
         response.setContentType("text/html;charset=UTF-8");
         PersonDAO pdao = new PersonDAO();
         PrintWriter out = response.getWriter();
+        String difficultyToPassToACA = "";
+        int caseID = 0;
         try {
             CaseDAO casedao = new CaseDAO();
             String person_nric = request.getParameter("person_nric");
@@ -54,6 +56,7 @@ public class processCase extends HttpServlet {
                 String caseType = "complaint";
                 String complaintDescription = request.getParameter("complaintDescription");
                 String difficulty = request.getParameter("difficulty");
+                difficultyToPassToACA = difficulty + "";
                 String issues = request.getParameter("issues");
                 casedao.createCase(new complaintCase(complaintDescription, reported_date, caseType, recorded_employee_id, person_nric));
                 casedao.createComplaintCase(new complaintCase(difficulty, issues));
@@ -71,6 +74,7 @@ public class processCase extends HttpServlet {
                 String caseType = "complaint";
                 String description = request.getParameter("complaintDescription");
                 String difficulty = request.getParameter("difficulty");
+                difficultyToPassToACA = difficulty + "";
                 String issues = request.getParameter("issues");
                 casedao.createCase(new complaintCase(description, reported_date, caseType, recorded_employee_id, person_nric));
                 casedao.createComplaintCase(new complaintCase(difficulty, issues));
@@ -93,11 +97,22 @@ public class processCase extends HttpServlet {
             /*request.setAttribute("email", person_email);
              RequestDispatcher dispatcher = request.getRequestDispatcher("/SendEmail");
              dispatcher.forward(request, response);*/
+            
+            caseID = casedao.getLatestCaseID();
+            String caseIDToPassToACA = caseID+"";
+            request.setAttribute("difficultyToACA", difficultyToPassToACA);
+            request.setAttribute("caseIDToACA", caseIDToPassToACA);
+            RequestDispatcher dispatcher = request.getRequestDispatcher("/AutoCaseAllocation");
+            dispatcher.forward(request, response);
+            
         } catch (Exception e) {
 
         } finally {
             out.close();
         }
+        
+        //
+        
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">

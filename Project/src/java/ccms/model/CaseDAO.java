@@ -41,7 +41,11 @@ public class CaseDAO {
     private static final String INSERT_COMPLAINT_CASE = "INSERT INTO complaint_case (complaint_case_id, difficulty, issue, status, add_on_date, additional_info, closing_remark) VALUES (?,?,?,?,?,?,?)";
     private static final String INSERT_COMPLIMENT_CASE = "INSERT INTO compliment_case (compliment_case_id, compliment_dept) VALUES (?,?)";
     private static final String INSERT_EMPLOYEECOMPLIMENT_CASE = "INSERT INTO employee_compliment_case (compliment_case_id, employee_id) VALUES (?,?)";
-
+    private static final String GET_LATEST_CASE_ID="SELECT case_id\n" +
+        "FROM  `cases` \n" +
+        "ORDER BY  `reported_date` DESC \n" +
+        "LIMIT 1";
+    
     public CaseDAO() throws ParseException {
         autoUpdateCaseStatus();
         load();
@@ -667,7 +671,8 @@ public class CaseDAO {
     }
 
     public int insertComplaintCaseHandling(int caseID, int empID) {
-        Date received_date = new java.sql.Date(Calendar.getInstance().getTimeInMillis());
+        //Date received_date = new java.sql.Date(Calendar.getInstance().getTimeInMillis());
+        Timestamp received_date = new Timestamp(System.currentTimeMillis());
         Connection con = null;
         PreparedStatement ps = null;
         int rowUpdate = 0;
@@ -676,7 +681,7 @@ public class CaseDAO {
             ps = con.prepareStatement(INSERT_COMPLAINT_CASE_HANDLING);
             ps.setInt(1, caseID);
             ps.setInt(2, empID);
-            ps.setDate(3, received_date);
+            ps.setTimestamp(3, received_date);
             rowUpdate = ps.executeUpdate();
         } catch (SQLException se) {
             se.printStackTrace();
@@ -857,5 +862,48 @@ public class CaseDAO {
             }
         }
         return rowUpdate;
+    }
+    
+    public int getLatestCaseID() throws ParseException {
+
+        Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        int caseid = 0;
+        try {
+            con = ConnectionManager.getConnection();
+            ps = con.prepareStatement(GET_LATEST_CASE_ID);
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+                caseid = rs.getInt("case_id");
+            }
+
+        } catch (SQLException se) {
+            se.printStackTrace();
+        } finally {
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            if (ps != null) {
+                try {
+                    ps.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            if (con != null) {
+                try {
+                    con.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return caseid;
     }
 }
