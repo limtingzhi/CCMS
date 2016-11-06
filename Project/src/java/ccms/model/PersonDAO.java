@@ -10,7 +10,7 @@ import java.util.*;
 public class PersonDAO {
     private static final String GET_ALL_PERSON = "SELECT * FROM person";
     private static final String GET_PERSON_BY_NRIC = "SELECT * FROM person WHERE nric = ?";
- 
+    
     public ArrayList<Person> getAllPerson() {
         ArrayList<Person> personList = new ArrayList<Person>();
         Connection con = null;

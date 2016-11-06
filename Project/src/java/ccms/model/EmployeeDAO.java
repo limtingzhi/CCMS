@@ -115,7 +115,7 @@ public class EmployeeDAO {
         }       
         return manager;
     }
-    
+
     public Employee getEmployeeByID(int employeeID) {
         Employee employee = null;
         Connection con = null;
@@ -136,6 +136,7 @@ public class EmployeeDAO {
                         rs.getString("position"),
                         rs.getString("username"),
                         rs.getString("password"),
+                        rs.getString("email"),
                         dept, 
                         rs.getDate("on_leave_start"),
                         rs.getDate("on_leave_end"),

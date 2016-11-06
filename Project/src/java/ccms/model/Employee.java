@@ -12,6 +12,7 @@ public class Employee {
     private String position;
     private String username;
     private String password;
+    private String email;
     private Department dept;
     private Date onLeaveStart;
     private Date onLeaveEnd;
@@ -24,6 +25,18 @@ public class Employee {
         this.username = username;
         this.password = password;
         this.dept = dept;
+        this.onLeaveStart = onLeaveStart;
+        this.onLeaveEnd = onLeaveEnd;
+        this.inCharge_id = inCharge_id;
+    }
+    public Employee(int employeeID, String name, String position, String username, String password, String email, Department dept, Date onLeaveStart, Date onLeaveEnd, int inCharge_id) {
+        this.employeeID = employeeID;
+        this.name = name;
+        this.position = position;
+        this.username = username;
+        this.password = password;
+        this.dept = dept;
+        this.email = email;
         this.onLeaveStart = onLeaveStart;
         this.onLeaveEnd = onLeaveEnd;
         this.inCharge_id = inCharge_id;
@@ -47,6 +60,10 @@ public class Employee {
 
     public String getPassword() {
         return password;
+    }
+    
+    public String getEmail() {
+        return email;
     }
 
     public Department getDept() {

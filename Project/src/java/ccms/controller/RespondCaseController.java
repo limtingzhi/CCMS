@@ -125,7 +125,7 @@ public class RespondCaseController extends HttpServlet {
         }
     }
 
-    public void sendEmail(String complainantName, String description, String additional_info, String response, String email, int caseID) {        
+public void sendEmail(String complainantName, String description, String additional_info, String response, String email, int caseID) {        
         final String username = "ccms.mom.noreply@gmail.com";
 	final String password = "helloworld01";
         // Recipient's email ID needs to be mentioned.
