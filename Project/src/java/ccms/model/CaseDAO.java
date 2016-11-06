@@ -2,6 +2,7 @@ package ccms.model;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.net.URL;
 import java.sql.*;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -17,16 +18,16 @@ public class CaseDAO {
     private EmployeeDAO empDAO;
     private PersonDAO personDAO;
     private static final LinkedHashMap<Integer, String> holidays = new LinkedHashMap<Integer, String>();
-    private static final String GET_CASE_BY_EMP_ID = "SELECT c.person_nric, c.reported_date, cc.complaint_case_id, cc.issue, cc.difficulty, cc.add_on_date, max(ch.received_date) as received, ch.last_saved FROM cases c, complaint_case cc, complaint_case_handling ch WHERE c.case_id = cc.complaint_case_id AND cc.complaint_case_id = ch.complaint_case_id AND ch.employee_id = ? AND cc.status NOT IN ('Replied', 'Closed') AND ch.response_date IS NULL group by complaint_case_id having received >= if(add_on_date is null, '0001-01-01 00:00:00', add_on_date) ORDER BY ch.received_date asc";
+    private static final String GET_CASE_BY_EMP_ID = "SELECT c.person_nric, c.reported_date, cc.complaint_case_id, cc.issue, cc.difficulty, cc.add_on_date, max(ch.received_date) as received, ch.last_saved FROM cases c, complaint_case cc, complaint_case_handling ch WHERE c.case_id = cc.complaint_case_id AND cc.complaint_case_id = ch.complaint_case_id AND ch.employee_id = ? AND cc.status NOT IN ('Replied', 'Closed') AND ch.response_date IS NULL group by complaint_case_id ORDER BY ch.received_date asc";
     private static final String GET_CASE_BY_CASE_ID = "SELECT p.nric, p.email, p.name, p.contact_no, c.description, cc.difficulty, cc.issue, cc.additional_info, cc.add_on_date, ch.response FROM cases c, complaint_case cc, complaint_case_handling ch, person p WHERE ch.complaint_case_id = ? AND ch.response_date IS NULL AND c.case_id = cc.complaint_case_id AND cc.complaint_case_id = ch.complaint_case_id AND c.person_nric = p.nric";
     private static final String UPDATE_CASE_RESPONSE = "UPDATE complaint_case_handling SET response = ?, response_date = CAST(? AS DATETIME), last_saved = ? WHERE employee_id = ? AND complaint_case_id = ?";
-    private static final String SAVE_CASE_RESPONSE = "UPDATE complaint_case_handling SET response = ?, last_saved = ? WHERE employee_id = ? AND complaint_case_id = ?";
+    private static final String SAVE_CASE_RESPONSE = "UPDATE complaint_case_handling SET response = ?, last_saved = ? WHERE employee_id = ? AND complaint_case_id = ? ORDER BY received_date desc LIMIT 1";
     private static final String GET_CASE_RESPONSES = "SELECT e.position, e.employee_id, e.name, ch.response_date, ch.response FROM complaint_case_handling ch, employee e WHERE e.employee_id = ch.employee_id AND complaint_case_id = ? AND ch.response_date IS NOT NULL ORDER BY ch.response_date DESC";
     private static final String INSERT_TO_CASEHANDLING = "INSERT INTO complaint_case_handling (complaint_case_id, employee_id, received_date, response_date, response, last_saved) VALUES (?, ?, CAST(? AS DATETIME), NULL, NULL, NULL)";
     private static final String UPDATE_CASE_STATUS = "UPDATE complaint_case SET status = ? WHERE complaint_case_id = ?";
     private static final String AUTO_UPDATE_CASE_2_WEEKS = "UPDATE complaint_case SET status = 'Closed' WHERE complaint_case_id IN (SELECT complaint_case_id FROM (SELECT complaint_case_id, MAX(response_date) AS response_date FROM complaint_case_handling WHERE response_date IS NOT NULL GROUP BY complaint_case_id HAVING DATEDIFF(NOW(), response_date) > 14) as temp)";
     private static final String GET_OUTSTANDING_CASES = "SELECT c.reported_date, cc.issue, cc.difficulty, cc.add_on_date, ch.complaint_case_id, ch.employee_id, MAX(received_date) AS received, ch.response, ch.last_saved FROM cases c, complaint_case_handling ch, complaint_case cc WHERE c.case_id = cc.complaint_case_id AND cc.complaint_case_id = ch.complaint_case_id AND ch.response_date IS NULL GROUP BY ch.complaint_case_id";
-    
+
     public CaseDAO() throws ParseException {
         autoUpdateCaseStatus();
         load();
@@ -49,7 +50,9 @@ public class CaseDAO {
         //Load list of holidays in 2016 from Holidays2016.txt
         Scanner sc = null;
         try {
-            File file = new File("./data/Holidays2016.txt");
+            // Demo Purpose: Only have 2016 and 2017 holidays
+            URL obj = CaseDAO.class.getResource("./data/Holidays.txt");
+            File file = new File(obj.getPath());
             sc = new Scanner(file);
             sc.useDelimiter(",|\r\n");
 
@@ -65,10 +68,10 @@ public class CaseDAO {
             if (sc != null) {
                 sc.close();
             }
-        }
+       }   
     }
-    
-    public LinkedHashMap<Integer, ArrayList<String>> getOutstandingCases() throws ParseException {
+
+    public LinkedHashMap<Integer, ArrayList<String>> getOutstandingCases() throws ParseException {    
         LinkedHashMap<Integer, ArrayList<String>> cases = new LinkedHashMap<Integer, ArrayList<String>>();
         SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy");
         Connection con = null;
@@ -170,7 +173,8 @@ public class CaseDAO {
 
     public LinkedHashMap<Integer, ArrayList<String>> getAllCasebyEmpID(int employee_id) throws ParseException {
         LinkedHashMap<Integer, ArrayList<String>> cases = new LinkedHashMap<Integer, ArrayList<String>>();
-        SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy");
+        SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy hh:mm a");
+
         Connection con = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
@@ -185,7 +189,7 @@ public class CaseDAO {
                 ArrayList<String> details = new ArrayList<String>();
                 int caseID = rs.getInt("complaint_case_id");
                 String personNRIC = rs.getString("person_nric");
-                String dateReceived = df.format(rs.getDate("received"));
+                String dateReceived = df.format(rs.getTimestamp("received"));
                 String difficulty = rs.getString("difficulty");
                 int daysToAdd = 3;
                 if (difficulty.equalsIgnoreCase("hard")) {
@@ -437,7 +441,7 @@ public class CaseDAO {
 
     public LinkedHashMap<Integer, ArrayList<String>> getCaseResponses(int caseID) {
         LinkedHashMap<Integer, ArrayList<String>> map = new LinkedHashMap<Integer, ArrayList<String>>();
-        SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy");
+        SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy hh:mm a");
         Connection con = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
@@ -450,9 +454,9 @@ public class CaseDAO {
 
             while (rs.next()) {
                 ArrayList<String> responses = new ArrayList<String>();
-                String responseDate = df.format(rs.getDate("response_date"));
+                String responseDate = df.format(rs.getTimestamp("response_date"));
                 String response = rs.getString("response");
-                String name = rs.getString("name") + ", " + rs.getString("position");
+                String name = rs.getString("name") + "," + rs.getString("position");
                 int employeeID = rs.getInt("employee_id");
                 responses.add(name);
                 responses.add(responseDate);
@@ -498,7 +502,7 @@ public class CaseDAO {
 
         //Set the recorded date to calendar
         SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-        SimpleDateFormat sdf2 = new SimpleDateFormat("dd-M-yyyy hh:mm:ss");
+        SimpleDateFormat sdf2 = new SimpleDateFormat("dd/MM/yyyy hh:mm a");
         Calendar cal = Calendar.getInstance();
         java.util.Date date = sdf1.parse(dateStr);
         dateStr = sdf2.format(date);
@@ -507,15 +511,15 @@ public class CaseDAO {
         // iterate over the dates from now and check if each day is a business day
         int businessDayCounter = 0;
         while (businessDayCounter < daysToAdd) {
+            cal.add(Calendar.DAY_OF_YEAR, 1);
             int dayOfWeek = cal.get(Calendar.DAY_OF_WEEK);
             //If the dayOfWeek hits Saturday, Sunday or Holiday, it will not add to businessDayCounter but it add one more day on the calendar
             if (dayOfWeek != Calendar.SATURDAY && dayOfWeek != Calendar.SUNDAY && !holidays.containsKey(cal.get(Calendar.DAY_OF_YEAR))) {
                 businessDayCounter++;
             }
-            cal.add(Calendar.DAY_OF_YEAR, 1);
         }
 
-        sdf2 = new SimpleDateFormat("dd/MM/yyyy");
+        sdf2 = new SimpleDateFormat("dd/MM/yyyy hh:mm a");
         expectedDate = sdf2.format(cal.getTime());
         return expectedDate;
     }

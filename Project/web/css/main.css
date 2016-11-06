@@ -88,7 +88,7 @@ input, select {
     width: 92.5%;
     padding: 8px 9px;
     border: 1px solid #BBB;
-    border-radius: 2px;
+    border-radius: 3px;
     outline: none;  
 }
 
@@ -104,7 +104,7 @@ input, select {
     width: 50%;
     height: 35px;
     border: none;
-    border-radius: 2px;
+    border-radius: 3px;
     text-align: center;
     font-weight: bold;
     font-size: 16px;
@@ -123,14 +123,4 @@ input, select {
     text-align: center;
     color: #DD4B39;
     padding-top: 10px;
-}
-
-#title {
-    margin-bottom: 15px;
-    text-align: right;
-    width: 100%;
-    font-size: 22px;
-    font-weight: 700;
-    letter-spacing: -0.5px;
-    color: #232323;
 }

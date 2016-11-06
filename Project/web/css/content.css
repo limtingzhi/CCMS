@@ -1,0 +1,237 @@
+/* 
+    Document   : content
+    Created on : Nov 5, 2016, 5:06:55 PM
+    Author     : limtingzhi
+    Description:
+        Purpose of the stylesheet follows.
+*/
+
+#background-content {
+    height: 100%;
+    margin-left: 3%;
+    margin-right: 3%;
+    margin-bottom: 3%;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-color: #FFF;
+}
+
+.title {
+    padding-top: 20px;
+    padding-bottom: 10px;
+    text-align: left;
+    width: 100%;
+    font-size: 22px;
+    font-weight: 700;
+    color: #232323;
+}
+
+.title img,
+.title-sub img {
+    position: relative;
+    top: 7px;
+    margin-right: 5px;
+    height: 30px;
+    width: 30px;
+}
+
+.title-sub {
+    text-align: left;
+    width: 100%;
+    font-size: 18px;
+    color: #232323;
+}
+
+/* table */
+table {
+    table-layout:fixed;
+    width: 100%;
+    clear: both;
+    border-collapse: collapse;
+    border-spacing: 0;
+    font-size: 13px;
+    text-align: center; 
+    white-space: nowrap; }
+
+/* header and footer styles */
+table thead th,
+table tfoot th {
+    font-weight: bold; 
+    outline: none; }
+table thead th,
+table thead td {
+    background-color: #E3E3E3;
+    border: 1px solid #9E9E9E;    
+    white-space: normal;
+    overflow: hidden;
+    font-weight: bold;
+    text-overflow: ellipsis;
+    word-wrap: break-word; }
+table thead th:active,
+table thead td:active {
+    outline: none; }
+
+table thead th:first-child,
+table thead td:first-child {
+    padding: 10px 0px;
+    background-color: #E3E3E3;
+    border: 1px solid #9E9E9E;   
+    width: 65px; }
+table thead th:last-child,
+table thead td:last-child {
+    padding: 10px 10px;
+    background-color: #E3E3E3;
+    border: 1px solid #9E9E9E;   
+    width: 150px; }
+
+/* body */
+table tbody tr {
+    background-color: #FFF; }
+table tbody tr.selected {
+    background-color: #FFF3C4; }
+table tbody th,
+table tbody td {
+    padding: 3px 3px; 
+    white-space: normal;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    word-wrap: break-word;
+    outline: none; 	
+    width: auto; }
+table tbody th:last-child,
+table tbody td:last-child {
+    white-space: normal; 
+    overflow: visible; }
+table tbody th div,
+table tbody td div {
+    white-space: normal; 
+    word-wrap: break-word; }
+
+/* row border */
+table tbody th, 
+table tbody td, 
+table tbody th, 
+table tbody td {
+    border: 1px solid #9E9E9E; }
+table tbody tr th:first-child,
+table tbody tr td:first-child {
+    border-left: 1px solid #9E9E9E; 
+    outline: none; }
+
+table.hover tbody tr:hover, table tbody tr:hover {
+    background-color: #FFF1D8; }
+table.hover tbody tr:hover.selected, table tbody tr:hover.selected {
+    background-color: #FFF1D8; }
+
+table,
+table th,
+table td {
+    -webkit-box-sizing: content-box;
+    -moz-box-sizing: content-box;
+    box-sizing: content-box; }
+
+/* specific css */
+.no-fixed td {
+    text-align: left !important;}
+.no-fixed thead td {
+    text-align: center !important;}
+.no-fixed thead th:first-child,
+.no-fixed thead td:first-child {
+    padding: 5px 0px; }
+.no-fixed.hover tbody tr:hover, .no-fixed tbody tr:hover {
+    background-color: transparent; }
+.no-fixed.hover tbody tr:hover.selected, .no-fixed tbody tr:hover.selected {
+    background-color: transparent; }
+.no-fixed.hover tbody td:hover, .no-fixed tbody td:hover {
+    background-color: #FFF1D8; }
+.no-fixed.hover tbody td:hover.selected, .no-fixed tbody td:hover.selected {
+    background-color: #FFF1D8; }
+
+.case-details td {
+    text-align: left !important;}
+.case-details thead td {
+    text-align: center !important;}
+.case-details thead td:last-child {
+    padding: 5px 10px;
+    border: 1px solid #9E9E9E;
+    border-top: 0px; }
+.case-details .col-1 {
+    width: 16.5%; }
+.case-details .col-2 {
+    width: 17%; }
+.case-details .col-3 {
+    width: 16.5%; }
+.case-details .col-4 {
+    width: 50%; }
+.case-details.hover tbody tr:hover, .case-details tbody tr:hover {
+    background-color: transparent; }
+.case-details.hover tbody tr:hover.selected, .case-details tbody tr:hover.selected {
+    background-color: transparent; }
+.case-details.hover tbody td:hover, .case-details tbody td:hover {
+    background-color: #FFF1D8; }
+.case-details.hover tbody td:hover.selected, .case-details tbody td:hover.selected {
+    background-color: #FFF1D8; }
+
+/* button */
+.img-btn input[type="image"] {
+    display: inline-block;
+    width: 30px;
+    height: 30px;
+    padding: 5px 5px;
+    text-align: center;
+    text-decoration: none !important;
+    cursor: pointer;
+    background-color: transparent;
+    border: 1px solid transparent; 
+    border-radius: 3px;
+    outline: none;
+}
+
+.img-btn input[type="image"]:hover {
+    border: 1px solid transparent;
+    background-color: #FF953E;
+    border-radius: 3px;
+}
+
+.handle-msg {
+    font-size: 14px;
+    text-align: center;
+    color: #DD4B39;
+    padding-bottom: 10px;
+}
+
+textarea {
+    width: 60%;
+    height: 200px;
+    border: 1px solid #BBB;
+    border-radius: 3px;
+    outline: none;
+    font-family: 'Roboto';
+}
+
+textarea:focus {
+    border: 1px solid #083667;
+}
+
+.content-form input[type="submit"],
+.content-form input[type="button"],
+.back-btn {
+    margin-top: 10px;
+    display: inline-block;
+    height: 25px;
+    border: none;
+    border-radius: 3px;
+    text-align: center;
+    font-weight: bold;
+    font-size: 14px;
+    color: white;
+    background-color: #EF6C00;
+    outline: none;
+    cursor: pointer;
+}
+
+.content-form input[type="submit"]:hover,
+.content-form input[type="button"]:hover,
+.back-btn:hover {
+    background-color: #D66000;
+}
