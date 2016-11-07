@@ -44,6 +44,7 @@ public class processCase extends HttpServlet {
 
         try {
             CaseDAO casedao = new CaseDAO();
+            EmployeeDAO empdao = new EmployeeDAO();
             //type of the case
             String[] type = request.getParameterValues("type");
             String complaintDescription = request.getParameter("complaintDescription");
@@ -53,6 +54,7 @@ public class processCase extends HttpServlet {
             String empOrDept = request.getParameter("employee_or_dept");
             String empName = request.getParameter("employee_name");
             String deptName = request.getParameter("employee_dept");
+
             //person's details
             String person_nric = request.getParameter("person_nric");
             String person_name = request.getParameter("person_name");
@@ -156,7 +158,6 @@ public class processCase extends HttpServlet {
                     casedao.createCase(new complaintCase(complaintDescription, reported_date, caseType, recorded_employee_id, person_nric));
                     casedao.createComplaintCase(new complaintCase(difficulty, issues));
                     request.setAttribute("email", person_email);
-
                     caseID = casedao.getLatestCaseID();
                     String caseIDToPassToACA = caseID + "";
                     request.setAttribute("difficultyToACA", difficulty);
@@ -167,14 +168,17 @@ public class processCase extends HttpServlet {
                 if (type[0].equals("Compliment") || (type.length == 2 && type[1].equals("Compliment"))) {
                     String caseType = "Compliment";
                     casedao.createCase(new complaintCase(complimentDescription, reported_date, caseType, recorded_employee_id, person_nric));
-                    request.setAttribute("email", person_email);
-
-                    if (empOrDept.equals("Employee")) {
+                    request.setAttribute("email", person_email);                    
+                    if (empOrDept.equals("Employee")) {                    
                         casedao.createComplimentCase(new complimentCase(empName, null));
                         casedao.createEmployeeComplimentCase(new complimentCase(empName, null));
+                        String emp_email = empdao.getEmployeeByName(empName);                       
+                        request.setAttribute("emp_email", emp_email);
                     } else {
                         casedao.createComplimentCase(new complimentCase(null, deptName));
                         casedao.createEmployeeComplimentCase(new complimentCase(null, deptName));
+                        String dir_email = empdao.getEmployeeByPosition();                      
+                        request.setAttribute("dir_email", dir_email);
                     }
                 }
 
@@ -197,9 +201,9 @@ public class processCase extends HttpServlet {
                     dispatcher.forward(request, response);
                 }
 
-                HttpSession session = request.getSession();
-                session.setAttribute("successMsg", "Case Created!");
-                response.sendRedirect("CreateCase.jsp");
+                //HttpSession session = request.getSession();
+                //session.setAttribute("successMsg", "Case Created!");
+                //response.sendRedirect("CreateCase.jsp");
                 return;
             }
 
