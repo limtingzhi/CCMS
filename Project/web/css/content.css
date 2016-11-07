@@ -130,9 +130,21 @@ table td {
     -moz-box-sizing: content-box;
     box-sizing: content-box; }
 
+table tbody input[type="text"]{
+    display: block;
+    width: 94%;
+    padding: 4px 5px;
+    border: 1px solid #BBB;
+    border-radius: 3px;
+    outline: none;  
+    font-family: 'Roboto'; }
+table tbody input[type="text"]:focus {
+    border: 1px solid #083667; }
+
 /* specific css */
 .no-fixed td {
-    text-align: left !important;}
+    text-align: left !important;
+    padding: 5px; }
 .no-fixed thead td {
     text-align: center !important;}
 .no-fixed thead th:first-child,
@@ -148,7 +160,8 @@ table td {
     background-color: #FFF1D8; }
 
 .case-details td {
-    text-align: left !important;}
+    text-align: left !important;
+    padding: 5px; }
 .case-details thead td {
     text-align: center !important;}
 .case-details thead td:last-child {
@@ -171,6 +184,89 @@ table td {
     background-color: #FFF1D8; }
 .case-details.hover tbody td:hover.selected, .case-details tbody td:hover.selected {
     background-color: #FFF1D8; }
+
+.create-case td {
+    text-align: left !important;
+    padding: 5px; }
+.create-case thead td {
+    text-align: center !important;}
+.create-case thead td:last-child {
+    padding: 5px 10px;
+    border: 1px solid #9E9E9E;
+    border-top: 0px; }
+.create-case .col-1 {
+    width: 13%; }
+.create-case .col-2 {
+    width: 9.5%; }
+.create-case .col-3 {
+    width: 18%; }
+.create-case .col-4 {
+    width: 9.5%; }
+.create-case .col-5 {
+    width: 50%; }
+.create-case.hover tbody tr:hover, .create-case tbody tr:hover {
+    background-color: transparent; }
+.create-case.hover tbody tr:hover.selected, .create-case tbody tr:hover.selected {
+    background-color: transparent; }
+.create-case.hover tbody td:hover, .create-case tbody td:hover {
+    background-color: #FFF1D8; }
+.create-case.hover tbody td:hover.selected, .create-case tbody td:hover.selected {
+    background-color: #FFF1D8; }
+.create-case textarea {
+    width: 98%;
+    height: 100px;
+    border: 1px solid #BBB;
+    border-radius: 3px;
+    outline: none;
+    font-family: 'Roboto'; }
+.create-case select {
+    width: 98%;
+    height: 28px;
+    border: 1px solid #BBB;
+    border-radius: 3px;
+    outline: none;
+    font-family: 'Roboto'; }
+.create-case select:focus {
+    border: 1px solid #083667; }
+.create-case select:disabled,
+.create-case textarea:disabled {
+    background-color: #EEE !important; }
+
+.checkbox-design {
+    width: 25px;
+    margin-top: 6px;
+    position: absolute; }
+.checkbox-design label {
+    cursor: pointer;
+    position: absolute;
+    width: 25px;
+    height: 25px;
+    font-weight: bold;
+    top: 0;
+    left: 0;
+    background: #eee;
+    border:1px solid #ddd; }
+.checkbox-design label:after {
+    opacity: 0.2;
+    content: '';
+    position: absolute;
+    width: 9px;
+    height: 5px;
+    background: transparent;
+    top: 6px;
+    left: 7px;
+    border: 3px solid #333;
+    border-top: none;
+    border-right: none;
+    transform: rotate(-45deg); }
+.checkbox-design label:hover::after {
+    opacity: 0.5; }
+.checkbox-design input[type=checkbox]:checked + label:after {
+    opacity: 1; }
+.checkboxLabel {
+    padding-left: 35px;
+    font-weight: bold;
+}
 
 /* button */
 .img-btn input[type="image"] {

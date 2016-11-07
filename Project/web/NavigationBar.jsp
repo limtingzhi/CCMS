@@ -17,7 +17,7 @@
             <span id="nav-text">MOM CCMS</span>                
             <div id="menu-nav">  
                 <a class="menu-text" href="Home.jsp">Home</a>
-                <a class="menu-text" href="Home.jsp">Create</a>
+                <a class="menu-text" href="CreateCase.jsp">Create</a>
                 <a class="menu-text" href="ListOfCases.jsp">Handle</a>
                 <a class="menu-text" href="SearchCase.jsp">Search</a>
                 <a class="menu-text" href="ReassignCase.jsp">Reassign</a>
