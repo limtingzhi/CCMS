@@ -87,10 +87,10 @@ public class SendEmailController extends HttpServlet {
             throws ServletException, IOException {
 
         String emailaddress = (String) request.getAttribute("email");
-        //String emp_email = (String) request.getAttribute("emp_email");
-        /*if (emp_email == null) {
+        String emp_email = (String) request.getAttribute("emp_email");
+        if (emp_email == null) {
             emp_email = "";
-        }*/
+        }
         String dir_email = (String) request.getAttribute("dir_email");
         if (dir_email == null) {
             dir_email = "";
@@ -181,7 +181,7 @@ public class SendEmailController extends HttpServlet {
                         + "MOM CCMS Auto-generated Email. Do not reply.");
                 Transport.send(message);
             }
-            /*if (emp_email != null) {
+            if (emp_email != null) {
                 to = emp_email;
                 message.addRecipient(Message.RecipientType.TO,
                         new InternetAddress(to));
@@ -192,7 +192,7 @@ public class SendEmailController extends HttpServlet {
                         + "\n"
                         + "MOM CCMS Auto-generated Email. Do not reply.");
                 Transport.send(message);
-            }*/
+            }
             if (!dir_email.equals("")) {
                 to = dir_email;
                 // Set To: header field of the header.
@@ -219,9 +219,9 @@ public class SendEmailController extends HttpServlet {
              + "<h1 align=\"center\">" + title + "</h1>\n"
              + "<p align=\"center\">" + res + "</p>\n"
              + "</body></html>");*/
-            //response.sendRedirect("Home.jsp");
-            RequestDispatcher dispatcher = request.getRequestDispatcher("Home.jsp");
-            dispatcher.forward(request, response);
+            response.sendRedirect("Home.jsp");
+            //RequestDispatcher dispatcher = request.getRequestDispatcher("Home.jsp");
+           // dispatcher.forward(request, response);
             return;
         } catch (MessagingException mex) {
             mex.printStackTrace();

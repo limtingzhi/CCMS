@@ -15,6 +15,7 @@ public class EmployeeDAO {
     private static final String GET_EMP_BY_NAME = "SELECT email FROM employee WHERE name = '"+"?"+"'";
     private static final String GET_EMP_BY_POSITION = "SELECT email FROM employee WHERE position = 'Director'";
     private static final String GET_AVAIL_MANAGER = "SELECT employee_id FROM employee WHERE dept_id IN (SELECT dept_id FROM employee WHERE employee_id = ?) AND position = 'manager' AND on_leave = 0";
+    private static final String GETEMPEMAIL = "Select email from employee where name = ?";
 
     public EmployeeDAO(DepartmentDAO departmentDAO) {
         this.departmentDAO = departmentDAO;
@@ -182,15 +183,20 @@ public class EmployeeDAO {
         Statement stmt = null;
         //String email = "wayne.zhong91@gmail.com";
         String email = "";
+        
         try {
             con = ConnectionManager.getConnection();
             /*ps = con.prepareStatement(GET_EMP_BY_NAME);
             ps.setString(1, name);
             rs = ps.executeQuery();*/
-            rs = stmt.executeQuery("Select email from employee where name ='"+ name+ "'");
-
+           
+            ps = con.prepareStatement(GETEMPEMAIL);
+            ps.setString(1, name.trim());
+            rs = ps.executeQuery();
+ 
             rs.next();
-            email = (String) rs.getString(1);
+            email = rs.getString("email");
+   
         } catch (SQLException se) {
             se.printStackTrace();
         } finally {
