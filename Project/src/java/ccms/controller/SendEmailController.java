@@ -181,7 +181,7 @@ public class SendEmailController extends HttpServlet {
                         + "MOM CCMS Auto-generated Email. Do not reply.");
                 Transport.send(message);
             }
-            if (emp_email != null) {
+            if (!emp_email.equals("")) {
                 to = emp_email;
                 message.addRecipient(Message.RecipientType.TO,
                         new InternetAddress(to));
