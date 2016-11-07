@@ -183,15 +183,18 @@ public class SendEmailController extends HttpServlet {
             }
             if (!emp_email.equals("")) {
                 to = emp_email;
-                message.addRecipient(Message.RecipientType.TO,
+                MimeMessage message2 = new MimeMessage(session);
+                // Set From: header field of the header.
+                message2.setFrom(new InternetAddress(from));
+                message2.addRecipient(Message.RecipientType.TO,
                         new InternetAddress(to));
                 // Set Subject: header field
-                message.setSubject("You Have been complimented!");
-                message.setText("you have just receive a compliment. \n"
+                message2.setSubject("You Have been complimented!");
+                message2.setText("you have just receive a compliment. \n"
                         + "Thank you. \n"
                         + "\n"
                         + "MOM CCMS Auto-generated Email. Do not reply.");
-                Transport.send(message);
+                Transport.send(message2);
             }
             if (!dir_email.equals("")) {
                 to = dir_email;
