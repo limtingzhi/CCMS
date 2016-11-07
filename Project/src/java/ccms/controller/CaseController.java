@@ -65,6 +65,7 @@ public class CaseController extends HttpServlet {
         try {
             int caseID = Integer.parseInt(request.getParameter("caseID"));
 
+//            ArrayList<String> caseDetails = caseDAO.getCaseDetails(caseID);
             ArrayList<String> caseDetails = processCaseDetails(caseID);
 
             request.setAttribute("caseDetails", caseDetails);

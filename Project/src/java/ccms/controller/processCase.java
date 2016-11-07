@@ -68,23 +68,29 @@ public class processCase extends HttpServlet {
             // Validations - Person
             if (person_nric == null || person_nric.isEmpty()) {
                 errorMsg += "Please fill up the Person's NRIC.<br>";
-            } else if (person_nric.length() >= 9) {
+            } else if (person_nric.length() > 9) {
                 errorMsg += "Max length of NRIC should be 9.<br>";
+            } else if (person_nric.length() < 9) {
+                errorMsg += "Length of NRIC should be 9.<br>";
             }
 
             if (person_name == null || person_name.isEmpty()) {
                 errorMsg += "Please fill up the Person's Name.<br>";
-            } else if (person_name.length() >= 100) {
+            } else if (person_name.length() > 100) {
                 errorMsg += "Max length of Name should be 100.<br>";
-            } else if (person_contact == null || person_contact.isEmpty()) {
+            } 
+            
+            if (person_contact == null || person_contact.isEmpty()) {
                 errorMsg += "Please fill up the Person's Contact No.<br>";
-            } else if (person_contact.length() >= 8) {
+            } else if (person_contact.length() > 8) {
                 errorMsg += "Max length of Contact No should be 8.<br>";
+            } else if (person_contact.length() < 8) {
+                errorMsg += "Length of Contact No should be 8.<br>";
             }
 
             if (person_email == null || person_email.isEmpty()) {
                 errorMsg += "Please fill up the Person's Email.<br>";
-            } else if (person_email.length() >= 100) {
+            } else if (person_email.length() > 100) {
                 errorMsg += "Max length of Email should be 100.<br>";
             }
 
@@ -95,7 +101,7 @@ public class processCase extends HttpServlet {
                 if (type[0].equals("Complaint") || (type.length == 2 && type[1].equals("Complaint"))) {
                     if (complaintDescription == null || complaintDescription.isEmpty()) {
                         errorMsg += "Please fill up the Complaint Description.<br>";
-                    } else if (complaintDescription.length() >= 300) {
+                    } else if (complaintDescription.length() > 300) {
                         errorMsg += "Max length of Complaint Description should be 300.<br>";
                     }
                 }
@@ -103,7 +109,7 @@ public class processCase extends HttpServlet {
                 if (type[0].equals("Compliment") || (type.length == 2 && type[1].equals("Compliment"))) {
                     if (complimentDescription == null || complimentDescription.isEmpty()) {
                         errorMsg += "Please fill up the Compliment Description.<br>";
-                    } else if (complimentDescription.length() >= 300) {
+                    } else if (complimentDescription.length() > 300) {
                         errorMsg += "Max length of Compliment Description should be 300.<br>";
                     }
                 }
@@ -125,43 +131,7 @@ public class processCase extends HttpServlet {
             request.setAttribute("message", errorMsg);
 
             if (errorMsg.equals("")) {
-                Person p = pdao.getPersonByNRIC(person_nric);
-                if (p == null) {
-                    pdao.createPerson(new Person(person_nric, person_name, person_email, Integer.parseInt(person_contact)));
-                }
-
-//                out.println("type is" + type[0]);
-
-                if (type[0].equals("Complaint") || (type.length == 2 && type[1].equals("Complaint"))) {
-                    String caseType = "Complaint";
-                    casedao.createCase(new complaintCase(complaintDescription, reported_date, caseType, recorded_employee_id, person_nric));
-                    casedao.createComplaintCase(new complaintCase(difficulty, issues));
-                    request.setAttribute("email", person_email);
-
-                    caseID = casedao.getLatestCaseID();
-                    String caseIDToPassToACA = caseID + "";
-                    request.setAttribute("difficultyToACA", difficulty);
-                    request.setAttribute("caseIDToACA", caseIDToPassToACA);
-                }
-
-                if (type[0].equals("Compliment") || (type.length == 2 && type[1].equals("Compliment"))) {
-                    String caseType = "Compliment";
-                    casedao.createCase(new complaintCase(complimentDescription, reported_date, caseType, recorded_employee_id, person_nric));
-                    if (empOrDept.equals("Employee")) {
-                        casedao.createComplimentCase(new complimentCase(empName, null));
-                        casedao.createEmployeeComplimentCase(new complimentCase(empName, null));
-                    } else {
-                        casedao.createComplimentCase(new complimentCase(null, deptName));
-                        casedao.createEmployeeComplimentCase(new complimentCase(null, deptName));
-                    }
-                }
-
-
-//                    RequestDispatcher dispatcher = request.getRequestDispatcher("/SendEmail.do");
-//                    dispatcher.forward(request, response);
-//                    RequestDispatcher dispatcher = request.getRequestDispatcher("/AutoCaseAllocation");
-
-
+                // clear fields for UI form
                 request.setAttribute("person_nric", null);
                 request.setAttribute("person_name", null);
                 request.setAttribute("person_contact_no", null);
@@ -175,6 +145,57 @@ public class processCase extends HttpServlet {
                 request.setAttribute("employee_name", null);
                 request.setAttribute("employee_dept", null);
 
+                // add person
+                Person p = pdao.getPersonByNRIC(person_nric);
+                if (p == null) {
+                    pdao.createPerson(new Person(person_nric, person_name, person_email, Integer.parseInt(person_contact)));
+                }
+
+                // complaint case
+                if (type[0].equals("Complaint") || (type.length == 2 && type[1].equals("Complaint"))) {
+                    String caseType = "Complaint";
+                    casedao.createCase(new complaintCase(complaintDescription, reported_date, caseType, recorded_employee_id, person_nric));
+                    casedao.createComplaintCase(new complaintCase(difficulty, issues));
+                    request.setAttribute("email", person_email);
+
+                    caseID = casedao.getLatestCaseID();
+                    String caseIDToPassToACA = caseID + "";
+                    request.setAttribute("difficultyToACA", difficulty);
+                    request.setAttribute("caseIDToACA", caseIDToPassToACA);
+                }
+                
+                // compliment case
+                if (type[0].equals("Compliment") || (type.length == 2 && type[1].equals("Compliment"))) {
+                    String caseType = "Compliment";
+                    casedao.createCase(new complaintCase(complimentDescription, reported_date, caseType, recorded_employee_id, person_nric));
+                    request.setAttribute("email", person_email);
+
+                    if (empOrDept.equals("Employee")) {
+                        casedao.createComplimentCase(new complimentCase(empName, null));
+                        casedao.createEmployeeComplimentCase(new complimentCase(empName, null));
+                    } else {
+                        casedao.createComplimentCase(new complimentCase(null, deptName));
+                        casedao.createEmployeeComplimentCase(new complimentCase(null, deptName));
+                    }
+                }
+
+                // send emails
+                if (type.length == 2) {
+                    
+                }
+                
+                if (type[0].equals("Complaint") || (type.length == 2 && type[1].equals("Complaint"))) {
+                    dispatcher = request.getRequestDispatcher("/AutoCaseAllocation");
+                    dispatcher.forward(request, response);
+                }
+
+                if (type[0].equals("Compliment") || (type.length == 2 && type[1].equals("Compliment"))) {
+                    dispatcher = request.getRequestDispatcher("/ResponseEmail.do");
+                    dispatcher.forward(request, response);
+                }
+
+                
+                
                 HttpSession session = request.getSession();
                 session.setAttribute("successMsg", "Case Created!");
                 response.sendRedirect("CreateCase.jsp");

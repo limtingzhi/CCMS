@@ -93,11 +93,19 @@
                     out.println("<td>" + case1.getPersonName() + "</td>");
                     out.println("<td>" + case1.getPersonNric() + "</td>");
                     out.println("<td>" + case1.getType() + "</td>");
-                    out.println("<td>" + case1.getStatus() + "</td>");
-                    if (case1.getStatus().equals("Closed")) {
-                        out.println("<td><a href=SearchViewCase.jsp?caseid=" + case1.getID() + "&nric=" + case1.getPersonNric() + ">View Case</a> | Add Information | Archive </td>");
-                    } else {
-                        out.println("<td><a href=SearchViewCase.jsp?caseid=" + case1.getID() + "&nric=" + case1.getPersonNric() + ">View Case</a> | <a href=AddInfo.jsp?caseid=" + case1.getID() + "&nric=" + case1.getPersonNric() + ">Add Information</a> | <a href=ArchiveCase.jsp?caseid=" + case1.getID() + "&nric=" + case1.getPersonNric() + ">Archive</a></td>");
+                    
+                    if (case1.getType().equalsIgnoreCase("compliment")) {
+                        out.println("<td align=center> - </td>");
+                    }else{
+                        out.println("<td align=center>" + case1.getStatus() + "</td>");
+                    }
+                    
+                    if (case1.getType().equalsIgnoreCase("complaint") && case1.getStatus().equals("Closed")) {
+                        out.println("<td align=center><a href=SearchViewCase.jsp?caseid=" + case1.getID() + "&nric=" + case1.getPersonNric() + ">View Case</a> | Add Information | Archive </td>");
+                    } else if (case1.getType().equalsIgnoreCase("complaint")) {
+                        out.println("<td align=center><a href=SearchViewCase.jsp?caseid=" + case1.getID() + "&nric=" + case1.getPersonNric() + ">View Case</a> | <a href=AddInfo.jsp?caseid=" + case1.getID() + "&nric=" + case1.getPersonNric() + ">Add Information</a> | <a href=ArchiveCase.jsp?caseid=" + case1.getID() + "&nric=" + case1.getPersonNric() + ">Archive</a></td>");
+                    } else if (case1.getType().equalsIgnoreCase("compliment")) {
+                        out.println("<td align=center><a href=SearchViewCaseCompliment.jsp?caseid=" + case1.getID() + "&nric=" + case1.getPersonNric() + ">View Case</a></td>");
                     }
 
                     out.println("</tr>");

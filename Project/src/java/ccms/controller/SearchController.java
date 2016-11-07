@@ -52,14 +52,26 @@ public class SearchController extends HttpServlet {
                 request.setAttribute("noResult", "No Records Found. ");
             }
             
-        }else if (inputCaseID.equals("") || inputNRIC.equals("")) {
-            request.setAttribute("errorMsg", "Fill in the missing fields.");
-        } else {
+        }else if (inputCaseID.equals("") && inputNRIC.equals("")) {
+            request.setAttribute("errorMsg", "Fill in at least 1 field.");
+        }else {
 
             try {
-                int caseID = Integer.parseInt(inputCaseID);
+                int caseID = 0;
+                if (inputCaseID.equals("") && !inputNRIC.equals("")){
+                    caseID = 0;
+                }else if (!inputCaseID.equals("") && inputNRIC.equals("")) {
+                    caseID = Integer.parseInt(inputCaseID);
+                    inputNRIC = "empty";
+                }else{
+                    caseID = Integer.parseInt(inputCaseID);
+                }
+                
                 SearchCaseDAO searchCaseDao = new SearchCaseDAO();
                 ArrayList<SearchCase> searchCaseList = null;
+                
+                
+                
                 searchCaseList = searchCaseDao.searchCase(caseID, inputNRIC);
 
                 if (searchCaseList != null && searchCaseList.size() != 0) {

@@ -20,7 +20,7 @@
                 <a class="menu-text" href="CreateCase.jsp">Create</a>
                 <a class="menu-text" href="ListOfCases.jsp">Handle</a>
                 <a class="menu-text" href="SearchCase.jsp">Search</a>
-                <a class="menu-text" href="ReassignCase.jsp">Reassign</a>
+                <a class="menu-text" href="PotentialReassignCasesList.jsp">Reassign</a>
                 <a class="menu-text" href="Home.jsp">Statistics</a>
                 <a class="menu-text" href="Logout.jsp">Logout</a>
             </div>

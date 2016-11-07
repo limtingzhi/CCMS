@@ -20,6 +20,7 @@ import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
+import javax.servlet.RequestDispatcher;
 
 /**
  *
@@ -84,7 +85,7 @@ public class SendEmailController extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        String emailaddress = request.getParameter("email");
+        String emailaddress = (String)request.getAttribute("email");
         String caseid = request.getParameter("caseid");
 
         final String username = "ccms.mom.noreply@gmail.com";
@@ -107,7 +108,7 @@ public class SendEmailController extends HttpServlet {
         props.put("mail.smtp.host", "smtp.gmail.com");
         props.put("mail.smtp.port", "587");
 
-      // Get the default Session object.
+        // Get the default Session object.
         //Session session = Session.getDefaultInstance(props);
         Session session = Session.getInstance(props,
                 new javax.mail.Authenticator() {
@@ -156,6 +157,9 @@ public class SendEmailController extends HttpServlet {
             mex.printStackTrace();
         }
         //processRequest(request, response);
+        RequestDispatcher dispatcher = request.getRequestDispatcher("Home.jsp");
+        dispatcher.forward(request, response);
+        return;
     }
 
     /**
