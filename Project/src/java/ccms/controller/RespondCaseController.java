@@ -184,6 +184,8 @@ public class RespondCaseController extends HttpServlet {
                         + "<br/><br/>" + "<b>Response: </b><br/>" + response;
             }
 
+            email_content += "<br/>Any additional information or enquiries shall be provided within 2 weeks. ";
+
             email_content += "<br/><br/> Best Regards, <br/> Complaint and Compliment Department "
                     + "<br/><br/> Please do not reply to this email. For further enquiries, please email to ccms@mom.com or call to 612345678.";
             message.setContent(email_content, "text/html; charset=utf-8");
