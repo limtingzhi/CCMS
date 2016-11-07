@@ -86,16 +86,18 @@ public class CaseController extends HttpServlet {
         SimpleDateFormat sdf2 = new SimpleDateFormat("dd/MM/yyyy hh:mm a");
         ArrayList<String> caseDetails = caseDAO.getCaseDetails(caseID);
         String additional_info = caseDetails.get(6);
-        if (additional_info == null) {
+        if (additional_info.equals("N/A")) {
             caseDetails.set(6, "-");
         }
         int lastIndex = caseDetails.size() - 1;
         String addOnDate = caseDetails.get(lastIndex);
-        if (addOnDate == null) {
+        if (addOnDate.equals("N/A")) {
             caseDetails.set(lastIndex, "-");
         } else {
-            Date d = sdf1.parse(addOnDate);
-            caseDetails.set(lastIndex, sdf2.format(d));
+            int index1 = addOnDate.indexOf("on");
+            int index2 = addOnDate.indexOf(" ", index1);
+            String dateStr = addOnDate.substring(index2+1,addOnDate.length()-1);                     
+            caseDetails.set(lastIndex, dateStr);
         }
         return caseDetails;
     }

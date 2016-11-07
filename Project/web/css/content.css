@@ -267,6 +267,17 @@ table tbody input[type="text"]:focus {
     padding-left: 35px;
     font-weight: bold; }
 
+.action thead th:last-child,
+.action thead td:last-child {  
+    width: 45px; }
+
+.employees-list thead th:first-child,
+.employees-list thead td:first-child {
+    width: auto; }
+.employees-list thead th:last-child,
+.employees-list thead td:last-child {
+    width: 45px; }
+
 /* button */
 .img-btn input[type="image"],
 table tbody img {

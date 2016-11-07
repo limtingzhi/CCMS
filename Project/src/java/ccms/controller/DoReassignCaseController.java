@@ -45,7 +45,7 @@ public class DoReassignCaseController extends HttpServlet {
             throws ServletException, IOException, ParseException {
         response.setContentType("text/html;charset=UTF-8");
         PrintWriter out = response.getWriter();
-        SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy hh:mm a");        
+        SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy hh:mm a");
         SimpleDateFormat sdf1 = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss");
         SimpleDateFormat sdf2 = new SimpleDateFormat("dd/MM/yyyy");
         try {
@@ -60,7 +60,7 @@ public class DoReassignCaseController extends HttpServlet {
             String currentEmployeeName = employeeDAO.getEmployeeByID(eId).getName();
             caseDetails.add(11, currentEmployeeName);
             LinkedHashMap<Integer, ArrayList<String>> employeeWorkload = caseDAO.getCaseCountByDifficulty();
-        
+
             LinkedHashMap<Integer, ArrayList<String>> processedEmployeeWorkload = new LinkedHashMap<Integer, ArrayList<String>>();
             Set<Integer> employeeIDs = employeeWorkload.keySet();
 
@@ -71,18 +71,18 @@ public class DoReassignCaseController extends HttpServlet {
                 String employeePosition = e.getPosition();
                 java.util.Date onLeaveStartD = e.getOnLeaveStart();
                 String onLeaveStartStr = "";
-                if(onLeaveStartD != null) {
+                if (onLeaveStartD != null) {
                     onLeaveStartStr = df.format(onLeaveStartD);
                 }
-                
+
                 java.util.Date onLeaveEndD = e.getOnLeaveEnd();
                 String onLeaveEndStr = "";
-                if(onLeaveEndD != null) {
+                if (onLeaveEndD != null) {
                     onLeaveEndStr = df.format(onLeaveEndD);
                 }
-                
+
                 ArrayList<String> workload = employeeWorkload.get(id);
-                
+
                 //New ArrayList to store case count and remarks
                 ArrayList<String> arrToStoreCaseCount = new ArrayList<String>();
                 arrToStoreCaseCount.add(employeeName); //store employee name in index 0
@@ -90,33 +90,35 @@ public class DoReassignCaseController extends HttpServlet {
                 arrToStoreCaseCount.add("0"); //default count for easy
                 arrToStoreCaseCount.add("0"); //hard
                 arrToStoreCaseCount.add("0"); //super complex
-            
-                if(workload.size() > 0) {
-                    for(String casecount: workload) {
+
+                if (workload.size() > 0) {
+                    for (String casecount : workload) {
                         int lastIndexOf_ = casecount.lastIndexOf("_");
                         String casedifficulty = casecount.substring(0, lastIndexOf_);
                         String numCaseByDifficulty = casecount.substring(lastIndexOf_ + 1);
-                        if(casedifficulty.equalsIgnoreCase("easy")) {
+                        if (casedifficulty.equalsIgnoreCase("easy")) {
                             arrToStoreCaseCount.set(2, numCaseByDifficulty);
-                        } else if(casedifficulty.equalsIgnoreCase("hard")) {
+                        } else if (casedifficulty.equalsIgnoreCase("hard")) {
                             arrToStoreCaseCount.set(3, numCaseByDifficulty);
-                        } else if(casedifficulty.equalsIgnoreCase("super complex")) {
+                        } else if (casedifficulty.equalsIgnoreCase("super complex")) {
                             arrToStoreCaseCount.set(4, numCaseByDifficulty);
                         }
                     }
                 }
-            
+
                 String remarks = "";
-                if(onLeaveStartD != null && onLeaveEndD != null) {
+                if (onLeaveStartD != null && onLeaveEndD != null) {
                     boolean checkOverlap = expectedResponseDate.after(df.parse(onLeaveStartStr)) && expectedResponseDate.before(df.parse(onLeaveEndStr));
-                    if(checkOverlap) {
+                    if (checkOverlap) {
                         remarks = "Employee on leave from " + sdf2.format(onLeaveStartD) + " to " + sdf2.format(onLeaveEndD);
+                    } else {
+                        remarks = "-";
                     }
                 } else {
-                    remarks = "N/A";
+                    remarks = "-";
                 }
                 arrToStoreCaseCount.add(remarks); //add remarks to arraylist
-                        
+
                 //Store to LinkedHashMap to be passed over to JSP
                 processedEmployeeWorkload.put(id, arrToStoreCaseCount);
             }
@@ -131,7 +133,8 @@ public class DoReassignCaseController extends HttpServlet {
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**
-     * Handles the HTTP <code>GET</code> method.
+     * Handles the HTTP
+     * <code>GET</code> method.
      *
      * @param request servlet request
      * @param response servlet response
@@ -149,7 +152,8 @@ public class DoReassignCaseController extends HttpServlet {
     }
 
     /**
-     * Handles the HTTP <code>POST</code> method.
+     * Handles the HTTP
+     * <code>POST</code> method.
      *
      * @param request servlet request
      * @param response servlet response
@@ -175,5 +179,4 @@ public class DoReassignCaseController extends HttpServlet {
     public String getServletInfo() {
         return "Short description";
     }// </editor-fold>
-
 }

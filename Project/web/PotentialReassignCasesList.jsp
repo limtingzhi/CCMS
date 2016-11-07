@@ -7,8 +7,11 @@
 <%@page import="java.text.*"%>
 <%@page import="java.util.*"%>
 <%@page import="ccms.model.*"%>
+<%@include file="NavigationBar.jsp" %>
 <%@include file="Protect.jsp" %>
-<%    int empID = 0;
+
+<%
+    int empID = 0;
 
     if (user != null) {
         empID = user.getEmployeeID();
@@ -18,36 +21,41 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>Complaint Cases</title>
+        <link rel="stylesheet" href="css/main.css">
+        <link rel="stylesheet" href="css/home.css">
+        <link rel="stylesheet" href="css/content.css">
+        <title>MOM CCMS - Reassign Cases</title>
     </head>
-    <body>
+    <body id="background-content">
+        <p class="title"><img src="img/reassign.png">Reassign Case</p>
+            <% SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy hh:mm a");%>
+        <p class="title-sub"><i>Today's Date: <%=sdf.format(new Date())%></i></p>
+        <div class="handle-msg">
+            <%
+                String message = (String) request.getAttribute("reassignMessage");
+                if (message != null) {
+                    out.println(message);
+                }
+            %>
+        </div>   
         <%
-            String message = (String) request.getAttribute("reassignMessage");
-            if (message != null) {
-                out.println(message);
-            }
-
-            SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
-
-            out.println("<h2>Outstanding Cases</h2>");
-            out.println("Today's Date: " + sdf.format(new Date()));
 //            LinkedHashMap<Integer, ArrayList<String>> cList = (LinkedHashMap<Integer, ArrayList<String>>) request.getAttribute("potentialCases");
             ReassignCaseController rcc = new ReassignCaseController();
             LinkedHashMap<Integer, ArrayList<String>> cList = rcc.processOutstandingCases();
 //            out.println(cList.size());
             if (cList.size() > 0) {
         %>        
-        <table border="1">
+        <table class="action">
             <thead>
                 <tr>
                     <td>Case ID</td>
-                    <td>Date Received</td>
+                    <td>Received Date</td>
                     <td>Expected Response Date</td>
                     <td>Difficulty</td>
                     <td>Issue</td>
                     <td>Last Saved</td>
                     <td>Remarks</td>
-                    <td></td>
+                    <td>Action</td>                    
                 </tr>
             </thead>
             <tbody>
@@ -58,7 +66,7 @@
                 %>
             <form name="reassignCase" method="POST" action="DoReassignCaseController.do">        
                 <tr>
-                    <td><% out.println(caseID); %></td>
+                    <td><% out.println(caseID);%></td>
                     <%
                         String dateReceived = details.get(0);
                         String expectedDateResponse = details.get(1);
@@ -66,7 +74,7 @@
                         String issue = details.get(3);
                         String employeeID = details.get(6);
                         String lastSaved = details.get(7);
-                        String remarks = details.get(details.size()-1);
+                        String remarks = details.get(details.size() - 1);
                     %>
                     <td><%=dateReceived%></td>
                     <td><%=expectedDateResponse%></td>
@@ -74,21 +82,25 @@
                     <td><%=issue%></td>
                     <td><%=lastSaved%></td>
                     <td><%=remarks%></td>
-                    <td><input type="submit" value="Reassign Case" /></td>
-                    <input type="hidden" name="expectedDateResponse" value="<%=expectedDateResponse%>" />
-                    <input type="hidden" name="caseID" value="<%=caseID%>" />
-                    <input type="hidden" name="employeeID" value="<%=employeeID%>" />
+                    <td>                        
+                        <div class="img-btn">
+                            <input type="image" src="img/reassign.png" value="Reassign" title="Reassign"/>
+                        </div>
+                    </td>
+                <input type="hidden" name="expectedDateResponse" value="<%=expectedDateResponse%>" />
+                <input type="hidden" name="caseID" value="<%=caseID%>" />
+                <input type="hidden" name="employeeID" value="<%=employeeID%>" />
                 </tr>
             </form>
-            <%
-                }
-            %>
+            <% }
+            } else {%>
+            <tr>
+                <td colspan=8 align=center>
+                    <p>There are no outstanding cases at the moment.</p>
+                </td>
+            </tr>
+            <%}%>
         </tbody>           
-    </table>
-    <%
-        } else {
-            out.println("There is no outstanding cases at the moment.");
-        }
-    %>
+    </table>  
 </body>
 </html>
