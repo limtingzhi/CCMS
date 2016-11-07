@@ -3,6 +3,7 @@
     Created on : 23 Oct, 2016, 5:35:25 PM
     Author     : asus user
 --%>
+<%@page import="ccms.controller.ReassignCaseController"%>
 <%@page import="java.text.*"%>
 <%@page import="java.util.*"%>
 <%@page import="ccms.model.*"%>
@@ -30,7 +31,10 @@
 
             out.println("<h2>Outstanding Cases</h2>");
             out.println("Today's Date: " + sdf.format(new Date()));
-            LinkedHashMap<Integer, ArrayList<String>> cList = (LinkedHashMap<Integer, ArrayList<String>>) request.getAttribute("potentialCases");
+//            LinkedHashMap<Integer, ArrayList<String>> cList = (LinkedHashMap<Integer, ArrayList<String>>) request.getAttribute("potentialCases");
+            ReassignCaseController rcc = new ReassignCaseController();
+            LinkedHashMap<Integer, ArrayList<String>> cList = rcc.processOutstandingCases();
+//            out.println(cList.size());
             if (cList.size() > 0) {
         %>        
         <table border="1">
@@ -49,10 +53,8 @@
             <tbody>
                 <%
                     Set<Integer> keys = cList.keySet();
-//                    boolean containResponse = true;
                     for (Integer caseID : keys) {
                         ArrayList<String> details = cList.get(caseID);
-//                        containResponse = !details.get(details.size() - 1).equals("-");
                 %>
             <form name="reassignCase" method="POST" action="DoReassignCaseController.do">        
                 <tr>

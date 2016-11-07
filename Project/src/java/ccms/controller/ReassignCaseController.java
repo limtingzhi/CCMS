@@ -10,7 +10,6 @@ import ccms.model.DepartmentDAO;
 import ccms.model.Employee;
 import ccms.model.EmployeeDAO;
 import ccms.model.PersonDAO;
-//import static ccms.model.TestingMain.getWorkingDaysBetweenTwoDates;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.ParseException;
@@ -63,78 +62,82 @@ public class ReassignCaseController extends HttpServlet {
         response.setContentType("text/html;charset=UTF-8");
         PrintWriter out = response.getWriter();
         try {
-//            LinkedHashMap<Integer, ArrayList<String>> cList = checkCaseProgress();
-            LinkedHashMap<Integer, ArrayList<String>> caseList = caseDAO.getOutstandingCases();
-            SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-            SimpleDateFormat sdf2 = new SimpleDateFormat("dd-MM-yyyy");
-            Set<Integer> caseIDs = caseList.keySet();
-            for (int i : caseIDs) {
-                ArrayList<String> arr = caseList.get(i);
-                String dateReceivedStr = arr.get(0);
-                Date dateReceived = sdf1.parse(dateReceivedStr);
-            out.println("date received: " + sdf2.format(dateReceived));
-                String expectedResponseDateStr = arr.get(1);
-//            
-                Date today = new Date();
-                Date expectedResponseDate = sdf1.parse(expectedResponseDateStr);
-//            
-                int dayDiff = getWorkingDaysBetweenTwoDates(today, dateReceived);
-            out.println("expected response: " + sdf2.format(expectedResponseDate));
-                String lastsavedStr = arr.get(arr.size() - 1);
-//            int dayDiff = 0;
-                Date lastsaved = null;
-                if (!lastsavedStr.equals("-")) {
-                    lastsaved = sdf1.parse(lastsavedStr);
-                    dayDiff = getWorkingDaysBetweenTwoDates(today, lastsaved);
-                    int employeeID = Integer.parseInt(arr.get(6));
-                    String employeeName = eDAO.getEmployeeByID(employeeID).getName();
-                    arr.set(arr.size()-1, (sdf2.format(lastsaved)) + " by " + employeeName);
-//                out.println("last saved: " + sdf2.format(lastsaved));                    
-                } 
-//            //Check if case already overdue
-                boolean isOverdue = today.after(expectedResponseDate);
-                String remarks = "";
-
-            out.println("is overdue? " + isOverdue);
-            out.println("Day Diff: " + dayDiff);
-//            long diff = today.getTime() - lastWorkingDate.getTime();
-//            int dayDiff = (int) TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS);
-//            int dayDiff = getWorkingDaysBetweenTwoDates(today, lastWorkingDate);
-                if (isOverdue) {
-                    remarks = "Case overdue for " + dayDiff + " days";
-                } else if (!isOverdue && dayDiff > 0) {
-                    remarks = "Case idle for " + dayDiff + " days";
-                }
-                
-            String onLeaveStart = arr.get(4);
-            String onLeaveEnd = arr.get(5);
-            
-            if(onLeaveStart != null && onLeaveEnd != null) {
-                Date onLeaveStartD = sdf1.parse(onLeaveStart);
-                Date onLeaveEndD = sdf1.parse(onLeaveEnd);
-                
-//                System.out.println("start leave: " + sdf2.format(onLeaveStartD));
-//                System.out.println("end leave: " + sdf2.format(onLeaveEndD));
-                boolean checkOverlap = expectedResponseDate.after(onLeaveStartD) && expectedResponseDate.before(onLeaveEndD);
-                if(checkOverlap) {
-                    remarks = remarks + "<br/> Employee on leave from " + sdf2.format(onLeaveStartD) + " to " + sdf2.format(onLeaveEndD);
-                }
-//                System.out.println("Overlap: " + checkOverlap);
-            } 
-                
-
-                arr.set(0, sdf2.format(dateReceived));
-                arr.set(1, sdf2.format(expectedResponseDate));
-////            arr.set(arr.size()-1, sdf2.format(lastsaved));
-////            remarks = remarks + dayDiff;
-                arr.add(remarks);
-            }
+            LinkedHashMap<Integer, ArrayList<String>> caseList = processOutstandingCases();
             RequestDispatcher rd = request.getRequestDispatcher("PotentialReassignCasesList.jsp");
             request.setAttribute("potentialCases", caseList);
             rd.forward(request, response);
         } finally {
             out.close();
         }
+    }
+
+    public LinkedHashMap<Integer, ArrayList<String>> processOutstandingCases() throws ParseException {
+        LinkedHashMap<Integer, ArrayList<String>> caseList = caseDAO.getOutstandingCases();
+
+        SimpleDateFormat sdf1 = new SimpleDateFormat("dd/MM/yyyy hh:mm a");
+        SimpleDateFormat df1 = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+        SimpleDateFormat sdf2 = new SimpleDateFormat("dd/MM/yyyy");
+        Set<Integer> caseIDs = caseList.keySet();
+        for (int i : caseIDs) {
+            ArrayList<String> arr = caseList.get(i);
+            String dateReceivedStr = arr.get(0);
+            Date dateReceived = sdf1.parse(dateReceivedStr);
+            String tempDate = sdf2.format(dateReceived);
+            Date dateReceivedD = sdf2.parse(tempDate);
+
+            String expectedResponseDateStr = arr.get(1);
+
+            Date today = new Date();
+            Date expectedResponseDate = sdf1.parse(expectedResponseDateStr);
+            String todayStr = sdf2.format(today);
+            today = sdf2.parse(todayStr);
+
+            int dayDiff = getWorkingDaysBetweenTwoDates(today, dateReceived);
+
+            String lastsavedStr = arr.get(arr.size() - 1);
+
+            Date lastsaved = null;
+            if (!lastsavedStr.equals("-")) {
+                lastsaved = df1.parse(lastsavedStr);
+                String lastsavedtemp = sdf1.format(lastsaved);
+                lastsaved = sdf1.parse(lastsavedtemp);
+                dayDiff = getWorkingDaysBetweenTwoDates(today, lastsaved);
+                int employeeID = Integer.parseInt(arr.get(6));
+                String employeeName = eDAO.getEmployeeByID(employeeID).getName();
+                arr.set(arr.size() - 1, sdf2.format(lastsaved) + " by " + employeeName);
+            }
+            //Check if case already overdue
+            boolean isOverdue = today.after(expectedResponseDate);
+            String remarks = "";
+
+            if (isOverdue) {
+                remarks = "Case overdue for " + dayDiff + " days";
+            } else if (!isOverdue && dayDiff > 0) {
+                remarks = "Case idle for " + dayDiff + " days";
+            } else if (dayDiff == 0) {
+                remarks = "-";
+            }
+
+            String onLeaveStart = arr.get(4);
+            String onLeaveEnd = arr.get(5);
+
+            if (onLeaveStart != null && onLeaveEnd != null) {
+                Date onLeaveStartD = df1.parse(onLeaveStart);
+                String onLeaveStartStr = sdf1.format(onLeaveStartD);
+                onLeaveStartD = sdf1.parse(onLeaveStartStr);
+
+                Date onLeaveEndD = df1.parse(onLeaveEnd);
+                String onLeaveEndStr = sdf1.format(onLeaveEndD);
+                onLeaveEndD = sdf1.parse(onLeaveEndStr);
+
+                boolean checkOverlap = expectedResponseDate.after(onLeaveStartD) && expectedResponseDate.before(onLeaveEndD);
+                if (checkOverlap) {
+                    remarks = remarks + "<br/> Employee on leave from " + sdf2.format(onLeaveStartD) + " to " + sdf2.format(onLeaveEndD);
+                }
+            }
+            arr.add(remarks);
+        }
+        return caseList;
     }
 
     public int getWorkingDaysBetweenTwoDates(Date startDate, Date endDate) {

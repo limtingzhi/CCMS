@@ -44,32 +44,43 @@ public class DoReassignCaseController extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException, ParseException {
         response.setContentType("text/html;charset=UTF-8");
-        PrintWriter out = response.getWriter();        
+        PrintWriter out = response.getWriter();
+        SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy hh:mm a");        
         SimpleDateFormat sdf1 = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss");
-        SimpleDateFormat sdf2 = new SimpleDateFormat("dd-MM-yyyy");
+        SimpleDateFormat sdf2 = new SimpleDateFormat("dd/MM/yyyy");
         try {
             /* TODO output your page here. You may use following sample code. */
             int caseID = Integer.parseInt(request.getParameter("caseID"));
             int employeeID = Integer.parseInt(request.getParameter("employeeID"));
-            String expectedResponseDateStr = request.getParameter("expectedDateResponse") + " 00:00:00";
-            java.util.Date expectedResponseDate = sdf1.parse(expectedResponseDateStr);
+            String expectedResponseDateStr = request.getParameter("expectedDateResponse");
+            java.util.Date expectedResponseDate = df.parse(expectedResponseDateStr);
 
             ArrayList<String> caseDetails = caseDAO.getCaseDetails(caseID);
             int eId = Integer.parseInt(caseDetails.get(10));
             String currentEmployeeName = employeeDAO.getEmployeeByID(eId).getName();
-            caseDetails.set(11, currentEmployeeName);
-
+            caseDetails.add(11, currentEmployeeName);
             LinkedHashMap<Integer, ArrayList<String>> employeeWorkload = caseDAO.getCaseCountByDifficulty();
-
+        
             LinkedHashMap<Integer, ArrayList<String>> processedEmployeeWorkload = new LinkedHashMap<Integer, ArrayList<String>>();
             Set<Integer> employeeIDs = employeeWorkload.keySet();
+
             //Iterate through the LinkedHashMap using keys
             for (int id : employeeIDs) {
                 Employee e = employeeDAO.getEmployeeByID(id);
                 String employeeName = e.getName();
                 String employeePosition = e.getPosition();
                 java.util.Date onLeaveStartD = e.getOnLeaveStart();
+                String onLeaveStartStr = "";
+                if(onLeaveStartD != null) {
+                    onLeaveStartStr = df.format(onLeaveStartD);
+                }
+                
                 java.util.Date onLeaveEndD = e.getOnLeaveEnd();
+                String onLeaveEndStr = "";
+                if(onLeaveEndD != null) {
+                    onLeaveEndStr = df.format(onLeaveEndD);
+                }
+                
                 ArrayList<String> workload = employeeWorkload.get(id);
                 
                 //New ArrayList to store case count and remarks
@@ -80,21 +91,24 @@ public class DoReassignCaseController extends HttpServlet {
                 arrToStoreCaseCount.add("0"); //hard
                 arrToStoreCaseCount.add("0"); //super complex
             
-                for(String casecount: workload) {
-                    int lastIndexOf_ = casecount.lastIndexOf("_");
-                    String casedifficulty = casecount.substring(0, lastIndexOf_);
-                    String numCaseByDifficulty = casecount.substring(lastIndexOf_ + 1);
-                    if(casedifficulty.equalsIgnoreCase("easy")) {
-                        arrToStoreCaseCount.set(2, numCaseByDifficulty);
-                    } else if(casedifficulty.equalsIgnoreCase("hard")) {
-                        arrToStoreCaseCount.set(3, numCaseByDifficulty);
-                    } else if(casedifficulty.equalsIgnoreCase("super complex")) {
-                        arrToStoreCaseCount.set(4, numCaseByDifficulty);
+                if(workload.size() > 0) {
+                    for(String casecount: workload) {
+                        int lastIndexOf_ = casecount.lastIndexOf("_");
+                        String casedifficulty = casecount.substring(0, lastIndexOf_);
+                        String numCaseByDifficulty = casecount.substring(lastIndexOf_ + 1);
+                        if(casedifficulty.equalsIgnoreCase("easy")) {
+                            arrToStoreCaseCount.set(2, numCaseByDifficulty);
+                        } else if(casedifficulty.equalsIgnoreCase("hard")) {
+                            arrToStoreCaseCount.set(3, numCaseByDifficulty);
+                        } else if(casedifficulty.equalsIgnoreCase("super complex")) {
+                            arrToStoreCaseCount.set(4, numCaseByDifficulty);
+                        }
                     }
                 }
+            
                 String remarks = "";
                 if(onLeaveStartD != null && onLeaveEndD != null) {
-                    boolean checkOverlap = expectedResponseDate.after(onLeaveStartD) && expectedResponseDate.before(onLeaveEndD);
+                    boolean checkOverlap = expectedResponseDate.after(df.parse(onLeaveStartStr)) && expectedResponseDate.before(df.parse(onLeaveEndStr));
                     if(checkOverlap) {
                         remarks = "Employee on leave from " + sdf2.format(onLeaveStartD) + " to " + sdf2.format(onLeaveEndD);
                     }
@@ -106,7 +120,6 @@ public class DoReassignCaseController extends HttpServlet {
                 //Store to LinkedHashMap to be passed over to JSP
                 processedEmployeeWorkload.put(id, arrToStoreCaseCount);
             }
-            
             request.setAttribute("caseDetails", caseDetails);
             request.setAttribute("processedEmployeeWorkload", processedEmployeeWorkload);
             RequestDispatcher rd = request.getRequestDispatcher("ViewCase.jsp");

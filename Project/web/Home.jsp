@@ -49,7 +49,7 @@
                 <a class="features" href="PotentialReassignCasesList.jsp">
                     <img src="img/reassign.png"><br>
                     Reassign</a>
-                <a class="features" href="Home.jsp">
+                <a class="features" href="StatisticBoard.jsp">
                     <img src="img/statistics.png"><br>
                     Statistics</a>
             </div>
