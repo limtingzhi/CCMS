@@ -51,6 +51,7 @@
         <link rel="stylesheet" href="css/main.css">
         <link rel="stylesheet" href="css/home.css">
         <link rel="stylesheet" href="css/content.css">
+        <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
         <script src="js/jquery-3.1.1.min.js"></script>
         <script>
             $(function() {

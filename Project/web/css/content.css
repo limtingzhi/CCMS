@@ -265,11 +265,11 @@ table tbody input[type="text"]:focus {
     opacity: 1; }
 .checkboxLabel {
     padding-left: 35px;
-    font-weight: bold;
-}
+    font-weight: bold; }
 
 /* button */
-.img-btn input[type="image"] {
+.img-btn input[type="image"],
+table tbody img {
     display: inline-block;
     width: 30px;
     height: 30px;
@@ -280,21 +280,19 @@ table tbody input[type="text"]:focus {
     background-color: transparent;
     border: 1px solid transparent; 
     border-radius: 3px;
-    outline: none;
-}
+    outline: none; }
 
-.img-btn input[type="image"]:hover {
+.img-btn input[type="image"]:hover,
+table tbody img:hover {
     border: 1px solid transparent;
     background-color: #FF953E;
-    border-radius: 3px;
-}
+    border-radius: 3px; }
 
 .handle-msg {
     font-size: 14px;
     text-align: center;
     color: #DD4B39;
-    padding-bottom: 10px;
-}
+    padding-bottom: 10px; }
 
 textarea {
     width: 60%;
@@ -302,16 +300,16 @@ textarea {
     border: 1px solid #BBB;
     border-radius: 3px;
     outline: none;
-    font-family: 'Roboto';
-}
+    font-family: 'Roboto'; }
 
 textarea:focus {
-    border: 1px solid #083667;
-}
+    border: 1px solid #083667; }
 
 .content-form input[type="submit"],
 .content-form input[type="button"],
-.back-btn {
+.back-btn,
+.search-div input[type="submit"],
+.search-div input[type="reset"] {
     margin-top: 10px;
     display: inline-block;
     height: 25px;
@@ -323,11 +321,41 @@ textarea:focus {
     color: white;
     background-color: #EF6C00;
     outline: none;
-    cursor: pointer;
-}
+    cursor: pointer; }
 
 .content-form input[type="submit"]:hover,
 .content-form input[type="button"]:hover,
-.back-btn:hover {
+.back-btn:hover,
+.search-div input[type="submit"]:hover,
+.search-div input[type="reset"]:hover {
     background-color: #D66000;
 }
+
+/* Search */
+#search-padding {
+    margin-top: -10px; }
+.search-div {
+    text-align: center;
+    width: 48%;
+    padding-left: 1%;
+    padding-right: 1%;
+    float: left; }
+.search-div p {
+    border-bottom: 1px dotted #000000;
+    padding-bottom: 5px; 
+    font-weight: bold; }
+.search-div tbody td, 
+.search-div tbody td {
+    border: 1px solid transparent; }
+.search-div tbody tr th:first-child,
+.search-div tbody tr td:first-child {
+    border-left: 1px solid transparent; 
+    outline: none; }
+.search-div .col-1 {
+    width: 30%; }
+.search-div .col-2 {
+    width: 70%; }
+.search-div.hover tbody tr:hover, .search-div tbody tr:hover {
+    background-color: transparent; }
+.search-div.hover tbody tr:hover.selected, .search-div tbody tr:hover.selected {
+    background-color: transparent; }
