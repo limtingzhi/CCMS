@@ -5,7 +5,7 @@
  */
 package ccms.model;
 
-import java.sql.Date;
+import java.sql.Timestamp;
 
 /**
  *
@@ -14,14 +14,14 @@ import java.sql.Date;
 public class complaintCase {
 
     private String description;
-    private Date reported_date;
+    private Timestamp reported_date;
     private String type;
     private int recorded_employee_id;
     private String person_nric;
     private String difficulty;
     private String issues;
 
-    public complaintCase(String description, Date reported_date, String type, int recorded_employee_id, String person_nric) {
+    public complaintCase(String description, Timestamp reported_date, String type, int recorded_employee_id, String person_nric) {
         this.description = description;
         this.reported_date = reported_date;
         this.type = type;
@@ -57,7 +57,7 @@ public class complaintCase {
         return description;
     }
 
-    public Date getReported_date() {
+    public Timestamp getReported_date() {
         return reported_date;
     }
 
@@ -77,7 +77,7 @@ public class complaintCase {
         this.description = description;
     }
 
-    public void setReported_date(Date reported_date) {
+    public void setReported_date(Timestamp reported_date) {
         this.reported_date = reported_date;
     }
 
@@ -92,5 +92,4 @@ public class complaintCase {
     public void setPerson_nric(String person_nric) {
         this.person_nric = person_nric;
     }
-
 }

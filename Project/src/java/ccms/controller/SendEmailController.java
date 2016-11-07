@@ -20,6 +20,7 @@ import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
+import javax.servlet.RequestDispatcher;
 
 /**
  *
@@ -84,7 +85,9 @@ public class SendEmailController extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        String emailaddress = request.getParameter("email");
+        String emailaddress = (String) request.getAttribute("email");
+        String caseDifficulty = (String) request.getAttribute("difficulty");
+        String gotCompliment = (String) request.getAttribute("gotCompliment");
         String caseid = request.getParameter("caseid");
 
         final String username = "ccms.mom.noreply@gmail.com";
@@ -107,7 +110,7 @@ public class SendEmailController extends HttpServlet {
         props.put("mail.smtp.host", "smtp.gmail.com");
         props.put("mail.smtp.port", "587");
 
-      // Get the default Session object.
+        // Get the default Session object.
         //Session session = Session.getDefaultInstance(props);
         Session session = Session.getInstance(props,
                 new javax.mail.Authenticator() {
@@ -130,15 +133,43 @@ public class SendEmailController extends HttpServlet {
             message.addRecipient(Message.RecipientType.TO,
                     new InternetAddress(to));
             // Set Subject: header field
-            message.setSubject("Thank you for your complaint/compliment");
+            message.setSubject("Thank you for your complaint");
             // Now set the actual message
-            message.setText("We have received your complaint/compliment. \n"
-                    + "We will get back to you in 7 working days. \n"
-                    + "Thank you. \n"
-                    + "\n"
-                    + "MOM CCMS Auto-generated Email. Do not reply.");
+            if (caseDifficulty.equals("Easy")) {
+                message.setText("We have received your complaint. \n"
+                        + "We will get back to you in 3 working days. \n"
+                        + "Thank you. \n"
+                        + "\n"
+                        + "MOM CCMS Auto-generated Email. Do not reply.");
+                Transport.send(message);
+            }
+            if (caseDifficulty.equals("Hard")) {
+                message.setText("We have received your complaint. \n"
+                        + "We will get back to you in 5 working days. \n"
+                        + "Thank you. \n"
+                        + "\n"
+                        + "MOM CCMS Auto-generated Email. Do not reply.");
+                Transport.send(message);
+            }
+            if (caseDifficulty.equals("Super Complex")) {
+                message.setText("We have received your complaint. \n"
+                        + "We will get back to you in 7 working days. \n"
+                        + "Thank you. \n"
+                        + "\n"
+                        + "MOM CCMS Auto-generated Email. Do not reply.");
+                Transport.send(message);
+            }
+            if (gotCompliment.equals("compliment")) {
+                message.setSubject("Thank you for your compliment");
+                message.setText("We have received your compliment. \n"
+                        + "Thank you. \n"
+                        + "\n"
+                        + "MOM CCMS Auto-generated Email. Do not reply.");
+                Transport.send(message);
+            }
+
             // Send message
-            Transport.send(message);
+            
             String title = "Feedback has been successfully logged.";
             String res = "Acknowledgement email has been sent to user.";
             String docType
@@ -156,6 +187,9 @@ public class SendEmailController extends HttpServlet {
             mex.printStackTrace();
         }
         //processRequest(request, response);
+        RequestDispatcher dispatcher = request.getRequestDispatcher("Home.jsp");
+        dispatcher.forward(request, response);
+        return;
     }
 
     /**

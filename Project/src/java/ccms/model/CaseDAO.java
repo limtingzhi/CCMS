@@ -56,11 +56,11 @@ public class CaseDAO {
     private static final String INSERT_COMPLAINT_CASE = "INSERT INTO complaint_case (complaint_case_id, difficulty, issue, status, add_on_date, additional_info, closing_remark) VALUES (?,?,?,?,?,?,?)";
     private static final String INSERT_COMPLIMENT_CASE = "INSERT INTO compliment_case (compliment_case_id, compliment_dept) VALUES (?,?)";
     private static final String INSERT_EMPLOYEECOMPLIMENT_CASE = "INSERT INTO employee_compliment_case (compliment_case_id, employee_id) VALUES (?,?)";
-    private static final String GET_LATEST_CASE_ID="SELECT case_id\n" +
-        "FROM  `cases` \n" +
-        "ORDER BY  `reported_date` DESC \n" +
-        "LIMIT 1";
-    
+    private static final String GET_LATEST_CASE_ID = "SELECT case_id\n"
+            + "FROM  `cases` \n"
+            + "ORDER BY  `reported_date` DESC \n"
+            + "LIMIT 1";
+
     public CaseDAO() throws ParseException {
         autoUpdateCaseStatus();
         load();
@@ -101,7 +101,7 @@ public class CaseDAO {
             if (sc != null) {
                 sc.close();
             }
-       }   
+        }
     }
 
     public LinkedHashMap<Integer, ArrayList<String>> getCaseCountByDifficulty() throws ParseException {
@@ -120,8 +120,8 @@ public class CaseDAO {
                 int employeeID = Integer.parseInt(rs.getString("employee_id"));
                 String difficulty = rs.getString("difficulty");
                 String count = difficulty + "_" + rs.getString("casecountbydiff");
-                
-                if(!cases.containsKey(employeeID)) {                    
+
+                if (!cases.containsKey(employeeID)) {
                     details.add(count);
                     cases.put(employeeID, details);
                 } else {
@@ -155,7 +155,7 @@ public class CaseDAO {
         }
         return cases;
     }
-    
+
     public int updateCaseStatus(String description, String date, String type, int employeeID, String nric) {
         Connection con = null;
         PreparedStatement ps = null;
@@ -377,9 +377,9 @@ public class CaseDAO {
         Connection con = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
+        
         SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
         SimpleDateFormat sdf2 = new SimpleDateFormat("dd/MM/yyyy");
-//        SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy hh:mm a");
         
         try {
             con = ConnectionManager.getConnection();
@@ -398,6 +398,7 @@ public class CaseDAO {
                 String difficulty = rs.getString("difficulty");
                 String issue = rs.getString("issue");
                 String responseMsg = rs.getString("response");
+
                 if (additional_info == null) {
                     additional_info = "N/A";
                 }
@@ -406,9 +407,9 @@ public class CaseDAO {
                 } else {
                     java.util.Date d = sdf1.parse(addOnDate);
                     addOnDate = "(added on " + sdf2.format(d) + ")";
-//                    addOnDate = "(added on " + d + ")";
                 }
                 String employeeInCharge = String.valueOf(rs.getInt("employee_id"));
+
                 details.add(String.valueOf(case_id));
                 details.add(nric);
                 details.add(email);
@@ -418,8 +419,7 @@ public class CaseDAO {
                 details.add(additional_info);
                 details.add(difficulty);
                 details.add(issue);
-                details.add(responseMsg);                
-                details.add(employeeInCharge);
+                details.add(responseMsg);
                 details.add(addOnDate);
             }
         } catch (SQLException se) {
@@ -659,7 +659,7 @@ public class CaseDAO {
                 businessDayCounter++;
             }
         }
-        
+
         sdf2 = new SimpleDateFormat("dd/MM/yyyy hh:mm a");
         expectedDate = sdf2.format(cal.getTime());
         return expectedDate;
@@ -838,7 +838,7 @@ public class CaseDAO {
             con = ConnectionManager.getConnection();
             ps = con.prepareStatement(INSERT_NEW_CASE);
             ps.setString(1, c.getDescription());
-            ps.setDate(2, c.getReported_date());
+            ps.setTimestamp(2, c.getReported_date());
             ps.setString(3, c.getType());
             ps.setInt(4, c.getRecorded_employee_id());
             ps.setString(5, c.getPerson_nric());
@@ -880,7 +880,7 @@ public class CaseDAO {
             ps.setString(1, rs.getString(1));
             ps.setString(2, c.getDifficulty());
             ps.setString(3, c.getIssues());
-            ps.setString(4, "pending - Senior Executive");
+            ps.setString(4, "Pending - Allocation");
             ps.setString(5, null);
             ps.setString(6, null);
             ps.setString(7, null);
@@ -911,7 +911,6 @@ public class CaseDAO {
         PreparedStatement ps = null;
         Statement stmt = null;
         ResultSet rs = null;
-        ResultSet rs2 = null;
 
         int rowUpdate = 0;
         try {
@@ -922,10 +921,12 @@ public class CaseDAO {
             rs.next();
             int caseID = Integer.parseInt(rs.getString(1));
             ps.setInt(1, caseID);
-            rs = stmt.executeQuery("SELECT dept_id FROM department where name = '" + cc.getDepartment_name()+"'");
-            rs.next();
-            int deptID = Integer.parseInt(rs.getString(1));
-            ps.setInt(2, deptID);
+
+            if (cc.getDepartment_name() == null) {
+                ps.setBoolean(2, false);
+            } else {
+                ps.setBoolean(2, true);
+            }
             rowUpdate = ps.executeUpdate();
         } catch (SQLException se) {
             se.printStackTrace();
@@ -954,6 +955,8 @@ public class CaseDAO {
         Statement stmt = null;
         ResultSet rs = null;
         ResultSet rs2 = null;
+        ResultSet rs3 = null;
+        ResultSet rs4 = null;
 
         int rowUpdate = 0;
         try {
@@ -964,10 +967,24 @@ public class CaseDAO {
             rs.next();
             int caseID = Integer.parseInt(rs.getString(1));
             ps.setInt(1, caseID);
-            rs2 = stmt.executeQuery("SELECT employee_id FROM employee where name = '" + cc.getEmployee_name() + "'");
-            rs2.next();
-            int empID = Integer.parseInt(rs2.getString(1));
-            ps.setInt(2, empID);
+
+            if (cc.getDepartment_name() == null) {
+                // add employee
+                rs2 = stmt.executeQuery("SELECT employee_id FROM employee where name = '" + cc.getEmployee_name().trim() + "'");
+                rs2.next();
+                int empID = Integer.parseInt(rs2.getString(1));
+                ps.setInt(2, empID);
+            } else {
+                // add one employee from that department
+                rs3 = stmt.executeQuery("SELECT dept_id FROM department where name = '" + cc.getDepartment_name().trim() + "'");
+                rs3.next();
+                int deptID = Integer.parseInt(rs3.getString(1));
+                rs4 = stmt.executeQuery("SELECT employee_id FROM employee where dept_id = '" + deptID + " LIMIT 1'");
+                rs4.next();
+                int empID = Integer.parseInt(rs4.getString(1));
+                ps.setInt(2, empID);
+            }
+
             rowUpdate = ps.executeUpdate();
         } catch (SQLException se) {
             se.printStackTrace();
@@ -989,7 +1006,7 @@ public class CaseDAO {
         }
         return rowUpdate;
     }
-    
+
     public int getLatestCaseID() throws ParseException {
 
         Connection con = null;

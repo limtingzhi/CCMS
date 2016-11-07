@@ -137,8 +137,12 @@ public class AutoCaseAllocation extends HttpServlet {
             int rowInserted = caseDao.insertComplaintCaseHandling(caseIDInt, bestEmp.getEmployeeID());
 
         }
-        
-        RequestDispatcher dispatcher = request.getRequestDispatcher("Home.jsp");
+        String person_email = (String)request.getAttribute("email");
+        String gotCompliment = (String)request.getAttribute("gotCompliment");
+        request.setAttribute("difficulty", caseDifficulty);
+        request.setAttribute("email", person_email);
+        request.setAttribute("gotCompliment", gotCompliment);
+        RequestDispatcher dispatcher = request.getRequestDispatcher("/SendEmail.do");
         dispatcher.forward(request, response);
     }
 
