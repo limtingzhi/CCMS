@@ -53,7 +53,6 @@
                     <td>Expected Response Date</td>
                     <td>Difficulty</td>
                     <td>Issue</td>
-                    <td>Last Saved</td>
                     <td>Remarks</td>
                     <td>Action</td>                    
                 </tr>
@@ -80,7 +79,6 @@
                     <td><%=expectedDateResponse%></td>
                     <td><%=difficulty%></td>
                     <td><%=issue%></td>
-                    <td><%=lastSaved%></td>
                     <td><%=remarks%></td>
                     <td>                        
                         <div class="img-btn">
@@ -95,7 +93,7 @@
             <% }
             } else {%>
             <tr>
-                <td colspan=8 align=center>
+                <td colspan=7 align=center>
                     <p>There are no outstanding cases at the moment.</p>
                 </td>
             </tr>
