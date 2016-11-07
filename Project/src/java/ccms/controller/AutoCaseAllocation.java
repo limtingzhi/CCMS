@@ -45,10 +45,8 @@ public class AutoCaseAllocation extends HttpServlet {
         //String caseToBeAllocated = request.getParameter("listOfCaseID");
         String caseToBeAllocated = (String) request.getAttribute("caseIDToACA");
         String caseDifficulty = (String) request.getAttribute("difficultyToACA");
-
         List<String> caseDifficultyList = Arrays.asList(caseDifficulty.split(","));
         List<String> caseToBeAllocatedList = Arrays.asList(caseToBeAllocated.split(","));
-
         DepartmentDAO deptDao = new DepartmentDAO();
         EmployeeDAO empDao = new EmployeeDAO(deptDao);
         CaseDAO caseDao = null;
@@ -100,48 +98,38 @@ public class AutoCaseAllocation extends HttpServlet {
                                 //System.out.println(e1.getName());
                                 relevantEmpList.add(e1);
                             }
-                        }else{
+                        } else {
                             relevantEmpList.add(e1);
                             //System.out.println(e1.getName());
-                        }     
+                        }
 
                     } catch (ParseException pe) {
-
                     }
-
                 }
-
             }
-            
             int lowestWorkLoadCount = 999999999;
             Employee bestEmp = null;
-            for (int i=0; i < relevantEmpList.size(); i++) {
+            for (int i = 0; i < relevantEmpList.size(); i++) {
                 int empID = relevantEmpList.get(i).getEmployeeID();
                 try {
                     int workLoadEmp = caseDao.getWorkloadByEmpID(empID);
-                    System.out.println("Case ID: "+j+ ", Emp Name: "+relevantEmpList.get(i).getName()+", WORKLOAD: "+workLoadEmp);
-                    
-                    
+                    System.out.println("Case ID: " + j + ", Emp Name: " + relevantEmpList.get(i).getName() + ", WORKLOAD: " + workLoadEmp);
+
                     if (workLoadEmp < lowestWorkLoadCount) {
-                        lowestWorkLoadCount=workLoadEmp;
-                        bestEmp=relevantEmpList.get(i);     
+                        lowestWorkLoadCount = workLoadEmp;
+                        bestEmp = relevantEmpList.get(i);
                     }
-                }catch (ParseException pe) {
-                       
-               }
-                
+                } catch (ParseException pe) {
+                }
             }
-            
-            String status = "Pending - "+bestEmp.getPosition()+ " " +bestEmp.getName();
+            String status = "Pending - " + bestEmp.getPosition() + " " + bestEmp.getName();
             int rowUpdated = caseDao.updateComplaintCase(status, caseIDInt);
             int rowInserted = caseDao.insertComplaintCaseHandling(caseIDInt, bestEmp.getEmployeeID());
-
         }
-        String person_email = (String)request.getAttribute("email");
-        String gotCompliment = (String)request.getAttribute("gotCompliment");
+
+        String person_email = (String) request.getAttribute("email");
         request.setAttribute("difficulty", caseDifficulty);
         request.setAttribute("email", person_email);
-        request.setAttribute("gotCompliment", gotCompliment);
         RequestDispatcher dispatcher = request.getRequestDispatcher("/SendEmail.do");
         dispatcher.forward(request, response);
     }

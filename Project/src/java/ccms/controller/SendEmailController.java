@@ -5,6 +5,7 @@
  */
 package ccms.controller;
 
+import ccms.model.EmployeeDAO;
 import java.io.IOException;
 import java.io.PrintWriter;
 import javax.servlet.ServletException;
@@ -86,8 +87,22 @@ public class SendEmailController extends HttpServlet {
             throws ServletException, IOException {
 
         String emailaddress = (String) request.getAttribute("email");
+        //String emp_email = (String) request.getAttribute("emp_email");
+        /*if (emp_email == null) {
+            emp_email = "";
+        }*/
+        String dir_email = (String) request.getAttribute("dir_email");
+        if (dir_email == null) {
+            dir_email = "";
+        }
         String caseDifficulty = (String) request.getAttribute("difficulty");
+        if (caseDifficulty == null) {
+            caseDifficulty = "";
+        }
         String gotCompliment = (String) request.getAttribute("gotCompliment");
+        if (gotCompliment == null) {
+            gotCompliment = "";
+        }
         String caseid = request.getParameter("caseid");
 
         final String username = "ccms.mom.noreply@gmail.com";
@@ -142,16 +157,14 @@ public class SendEmailController extends HttpServlet {
                         + "\n"
                         + "MOM CCMS Auto-generated Email. Do not reply.");
                 Transport.send(message);
-            }
-            if (caseDifficulty.equals("Hard")) {
+            } else if (caseDifficulty.equals("Hard")) {
                 message.setText("We have received your complaint. \n"
                         + "We will get back to you in 5 working days. \n"
                         + "Thank you. \n"
                         + "\n"
                         + "MOM CCMS Auto-generated Email. Do not reply.");
                 Transport.send(message);
-            }
-            if (caseDifficulty.equals("Super Complex")) {
+            } else if (caseDifficulty.equals("Super Complex")) {
                 message.setText("We have received your complaint. \n"
                         + "We will get back to you in 7 working days. \n"
                         + "Thank you. \n"
@@ -159,6 +172,7 @@ public class SendEmailController extends HttpServlet {
                         + "MOM CCMS Auto-generated Email. Do not reply.");
                 Transport.send(message);
             }
+
             if (gotCompliment.equals("compliment")) {
                 message.setSubject("Thank you for your compliment");
                 message.setText("We have received your compliment. \n"
@@ -167,29 +181,55 @@ public class SendEmailController extends HttpServlet {
                         + "MOM CCMS Auto-generated Email. Do not reply.");
                 Transport.send(message);
             }
+            /*if (emp_email != null) {
+                to = emp_email;
+                message.addRecipient(Message.RecipientType.TO,
+                        new InternetAddress(to));
+                // Set Subject: header field
+                message.setSubject("You Have been complimented!");
+                message.setText("you have just receive a compliment. \n"
+                        + "Thank you. \n"
+                        + "\n"
+                        + "MOM CCMS Auto-generated Email. Do not reply.");
+                Transport.send(message);
+            }*/
+            if (!dir_email.equals("")) {
+                to = dir_email;
+                // Set To: header field of the header.
+                message.addRecipient(Message.RecipientType.TO, new InternetAddress(to));
+                // Set Subject: header field
+                message.setSubject("Your department has just been complimented!");
+                message.setText("Your department has just receive a compliment. \n"
+                        + "Thank you. \n"
+                        + "\n"
+                        + "MOM CCMS Auto-generated Email. Do not reply.");
+                Transport.send(message);
+            }
 
             // Send message
-            
-            String title = "Feedback has been successfully logged.";
-            String res = "Acknowledgement email has been sent to user.";
-            String docType
-                    = "<!doctype html public \"-//w3c//dtd html 4.0 "
-                    + "transitional//en\">\n";
-            out.println(docType
-                    + "<html>\n"
-                    + "<head><title>" + title + "</title></head>\n"
-                    + "<body bgcolor=\"#f0f0f0\">\n"
-                    + "<h1 align=\"center\">" + title + "</h1>\n"
-                    + "<p align=\"center\">" + res + "</p>\n"
-                    + "</body></html>");
-            response.sendRedirect("Home.jsp");
+            /*String title = "Feedback has been successfully logged.";
+             String res = "Acknowledgement email has been sent to user.";
+             String docType
+             = "<!doctype html public \"-//w3c//dtd html 4.0 "
+             + "transitional//en\">\n";
+             out.println(docType
+             + "<html>\n"
+             + "<head><title>" + title + "</title></head>\n"
+             + "<body bgcolor=\"#f0f0f0\">\n"
+             + "<h1 align=\"center\">" + title + "</h1>\n"
+             + "<p align=\"center\">" + res + "</p>\n"
+             + "</body></html>");*/
+            //response.sendRedirect("Home.jsp");
+            RequestDispatcher dispatcher = request.getRequestDispatcher("Home.jsp");
+            dispatcher.forward(request, response);
+            return;
         } catch (MessagingException mex) {
             mex.printStackTrace();
         }
         //processRequest(request, response);
-        RequestDispatcher dispatcher = request.getRequestDispatcher("Home.jsp");
-        dispatcher.forward(request, response);
-        return;
+        /*RequestDispatcher dispatcher = request.getRequestDispatcher("Home.jsp");
+         dispatcher.forward(request, response);
+         return;*/
     }
 
     /**
