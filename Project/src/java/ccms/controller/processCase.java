@@ -184,7 +184,9 @@ public class processCase extends HttpServlet {
                 }
 
                 if (type[0].equals("Complaint") || (type.length == 2 && type[1].equals("Complaint"))) {
-                    request.setAttribute("gotCompliment", "compliment");
+                    if (type.length == 2) {
+                        request.setAttribute("gotCompliment", "compliment");
+                    }
                     dispatcher = request.getRequestDispatcher("/AutoCaseAllocation");
                     dispatcher.forward(request, response);
                 }
