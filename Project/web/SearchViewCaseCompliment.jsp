@@ -70,18 +70,18 @@
             </thead>
             <tbody>
                 <tr>
-                    <td><b>Department</b></td>
-                    <td><% out.println(resultArray.get(6));%></td>
-                    <td rowspan="2"><b>Description</b></td>
-                    <td rowspan="2"><% out.println(resultArray.get(5));%></td>
-                </tr>
-                <tr>
+                    <% if (resultArray.get(6).equals("-")) {%>
                     <td><b>Employee Complimented</b></td>
                     <td><% out.println(resultArray.get(7));%></td>
+                    <% } else {%>
+                    <td><b>Department Complimented</b></td>
+                    <td><% out.println(resultArray.get(6));%></td>
+                    <% }%>
+                    <td><b>Description</b></td>
+                    <td><% out.println(resultArray.get(5));%></td>
                 </tr>
             </tbody>
         </table>
-
         <input class="back-btn" type="button" onclick="history.go(-1);" value="Back">
     </body>
 </html>
