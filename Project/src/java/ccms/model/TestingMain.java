@@ -162,82 +162,94 @@ public class TestingMain {
 //        System.out.println(insertedRow);
         
 //        LinkedHashMap<Integer, ArrayList<String>> cList = cDAO.getAllCasebyEmpID(2);
-        LinkedHashMap<Integer, ArrayList<String>> cList = cDAO.getOutstandingCases();
+//        LinkedHashMap<Integer, ArrayList<String>> cList = cDAO.getOutstandingCases();
 
 //        LinkedHashMap<Integer, ArrayList<String>> cList = cDAO.getCaseCountByDifficulty();
-        System.out.println(cList);
+//        System.out.println(cList);
 
+//        ArrayList<String> details = cDAO.getCaseDetails(5);
+//        int eId = Integer.parseInt(details.get(10));
+//        String currentEmployeeName = eDAO.getEmployeeByID(eId).getName();
+//        details.add(11, currentEmployeeName);
+//        
+//        System.out.println(details.size());
+//        for(String s: details) { 
+//            System.out.println(s);
+//        }
 
+        LinkedHashMap<Integer, ArrayList<String>> responses = cDAO.getCaseResponses(1);
+        System.out.println(responses);
+        
 //        String casecount = "easy_1";
 //        int lastIndexOf_ = casecount.lastIndexOf("_");
 //        String casedifficulty = casecount.substring(0, lastIndexOf_);
 //        System.out.println(casedifficulty + " " + casecount.substring(lastIndexOf_ + 1));
-        Date dateNow = new Date();
-        System.out.println(dateNow);
-
-        SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-        SimpleDateFormat sdf2 = new SimpleDateFormat("dd-MM-yyyy");
-//        String dateStr = "22-12-2016 00:00:00";
-//        System.out.println(sdf2.format(sdf1.parse(dateStr)));
-        Set<Integer> caseIDs = cList.keySet();
-        for (int i : caseIDs) {
-            ArrayList<String> arr = cList.get(i);
-            String dateReceivedStr = arr.get(0);
-            Date dateReceived = sdf1.parse(dateReceivedStr);
-            System.out.println("date received: " + sdf2.format(dateReceived));
-            String expectedResponseDateStr = arr.get(1);
-            
-            Date today = sdf1.parse("2016-11-07 01:00:00");
-//            Date today = new Date();
-            Date expectedResponseDate = sdf1.parse(expectedResponseDateStr);
-            
-            int dayDiff = getWorkingDaysBetweenTwoDates(today, dateReceived);
-            System.out.println("expected response: " + sdf2.format(expectedResponseDate));
-            String lastsavedStr = arr.get(arr.size() - 1);
-//            int dayDiff = 0;
-            Date lastsaved = null;
-            if (!lastsavedStr.equals("-")) {
-                lastsaved = sdf1.parse(lastsavedStr);
-                dayDiff = getWorkingDaysBetweenTwoDates(today, lastsaved);
-                arr.set(arr.size()-1, sdf2.format(lastsaved));
-                System.out.println("last saved: " + sdf2.format(lastsaved));
-            }
-            
-            String onLeaveStart = arr.get(4);
-            String onLeaveEnd = arr.get(5);
-            
-            if(onLeaveStart != null && onLeaveEnd != null) {
-                Date onLeaveStartD = sdf1.parse(onLeaveStart);
-                Date onLeaveEndD = sdf1.parse(onLeaveEnd);
-                
-                System.out.println("start leave: " + sdf2.format(onLeaveStartD));
-                System.out.println("end leave: " + sdf2.format(onLeaveEndD));
-                boolean checkOverlap = expectedResponseDate.after(onLeaveStartD) && expectedResponseDate.before(onLeaveEndD);
-                System.out.println("Overlap: " + checkOverlap);
-            } 
-            
-            //Check if case already overdue
-            boolean isOverdue = today.after(expectedResponseDate);
-            String remarks = "";
-
-            System.out.println("is overdue? " + today.after(expectedResponseDate));
-//            long diff = today.getTime() - lastWorkingDate.getTime();
-//            int dayDiff = (int) TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS);
-//            int dayDiff = getWorkingDaysBetweenTwoDates(today, lastWorkingDate);
-            if(isOverdue) {
-                remarks = "Case overdue for " + dayDiff + " days";
-            } else if (!isOverdue && dayDiff == 0) {
-                remarks = "Just received case";                
-            } else if (!isOverdue && dayDiff > 0) {
-                remarks = "Case idle for " + dayDiff + " days";
-            }
-            arr.set(0, sdf2.format(dateReceived));
-            arr.set(1, sdf2.format(expectedResponseDate));
-//            arr.set(arr.size()-1, sdf2.format(lastsaved));
-//            remarks = remarks + dayDiff;
-            arr.add(remarks);
-            System.out.println(remarks);
-        }
+//        Date dateNow = new Date();
+//        System.out.println(dateNow);
+//
+//        SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+//        SimpleDateFormat sdf2 = new SimpleDateFormat("dd-MM-yyyy");
+////        String dateStr = "22-12-2016 00:00:00";
+////        System.out.println(sdf2.format(sdf1.parse(dateStr)));
+//        Set<Integer> caseIDs = cList.keySet();
+//        for (int i : caseIDs) {
+//            ArrayList<String> arr = cList.get(i);
+//            String dateReceivedStr = arr.get(0);
+//            Date dateReceived = sdf1.parse(dateReceivedStr);
+//            System.out.println("date received: " + sdf2.format(dateReceived));
+//            String expectedResponseDateStr = arr.get(1);
+//            
+//            Date today = sdf1.parse("2016-11-07 01:00:00");
+////            Date today = new Date();
+//            Date expectedResponseDate = sdf1.parse(expectedResponseDateStr);
+//            
+//            int dayDiff = getWorkingDaysBetweenTwoDates(today, dateReceived);
+//            System.out.println("expected response: " + sdf2.format(expectedResponseDate));
+//            String lastsavedStr = arr.get(arr.size() - 1);
+////            int dayDiff = 0;
+//            Date lastsaved = null;
+//            if (!lastsavedStr.equals("-")) {
+//                lastsaved = sdf1.parse(lastsavedStr);
+//                dayDiff = getWorkingDaysBetweenTwoDates(today, lastsaved);
+//                arr.set(arr.size()-1, sdf2.format(lastsaved));
+//                System.out.println("last saved: " + sdf2.format(lastsaved));
+//            }
+//            
+//            String onLeaveStart = arr.get(4);
+//            String onLeaveEnd = arr.get(5);
+//            
+//            if(onLeaveStart != null && onLeaveEnd != null) {
+//                Date onLeaveStartD = sdf1.parse(onLeaveStart);
+//                Date onLeaveEndD = sdf1.parse(onLeaveEnd);
+//                
+//                System.out.println("start leave: " + sdf2.format(onLeaveStartD));
+//                System.out.println("end leave: " + sdf2.format(onLeaveEndD));
+//                boolean checkOverlap = expectedResponseDate.after(onLeaveStartD) && expectedResponseDate.before(onLeaveEndD);
+//                System.out.println("Overlap: " + checkOverlap);
+//            } 
+//            
+//            //Check if case already overdue
+//            boolean isOverdue = today.after(expectedResponseDate);
+//            String remarks = "";
+//
+//            System.out.println("is overdue? " + today.after(expectedResponseDate));
+////            long diff = today.getTime() - lastWorkingDate.getTime();
+////            int dayDiff = (int) TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS);
+////            int dayDiff = getWorkingDaysBetweenTwoDates(today, lastWorkingDate);
+//            if(isOverdue) {
+//                remarks = "Case overdue for " + dayDiff + " days";
+//            } else if (!isOverdue && dayDiff == 0) {
+//                remarks = "Just received case";                
+//            } else if (!isOverdue && dayDiff > 0) {
+//                remarks = "Case idle for " + dayDiff + " days";
+//            }
+//            arr.set(0, sdf2.format(dateReceived));
+//            arr.set(1, sdf2.format(expectedResponseDate));
+////            arr.set(arr.size()-1, sdf2.format(lastsaved));
+////            remarks = remarks + dayDiff;
+//            arr.add(remarks);
+//            System.out.println(remarks);
+//        }
 //        System.out.println(cList);
 //        ArrayList<String> caseDetails = cDAO.getCaseDetails(1);
 //        System.out.println(caseDetails.size());

@@ -72,8 +72,8 @@ public class RespondCaseController extends HttpServlet {
             String additional_info = request.getParameter("additional_info");
             String complainantName = request.getParameter("complainantName");
 
-            DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm a");
-            String date = dateFormat.format(new Date());
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+            String date = sdf.format(new Date());
             int update = 0;
             String message = "";
             //EMPLOYEE SAVE RESPONSE ONLY
@@ -104,7 +104,7 @@ public class RespondCaseController extends HttpServlet {
                     int inChargeID = eDAO.getEmployeeByID(employeeID).getInchargeID();
                     Employee inCharge = eDAO.getEmployeeByID(inChargeID);
                     String inChargePosition = inCharge.getPosition();
-                    status = "Pending - " + inChargePosition;
+                    status = "Pending - " + inChargePosition + " " + inCharge.getName();
 
                     int update1 = caseDAO.routeCaseToRespectiveInCharge(caseID, inChargeID, date); //Route case to in charge (e.g executive to manager)
                     int update2 = caseDAO.updateCaseStatus(status, caseID);

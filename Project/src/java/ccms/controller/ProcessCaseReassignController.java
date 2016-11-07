@@ -64,20 +64,48 @@ public class ProcessCaseReassignController extends HttpServlet {
             Date now = new Date();
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
             String dateStr = sdf.format(now);
+//            String message = "";
+
+            String status = "Pending - " + newEmp.getPosition() + " " + newEmp.getName();
+//
+//            int update1 = caseDAO.routeCaseToRespectiveInCharge(caseID, inChargeID, date); //Route case to in charge (e.g executive to manager)
+//            int update2 = caseDAO.updateCaseStatus(status, caseID);
+
             int rowUpdate = caseDAO.routeCaseToRespectiveInCharge(caseID, newAssignID, dateStr);
-            if (rowUpdate > 0) {
-                sendEmail(currentEmployeeName, currentEmployeeEmail, caseID); //Email to inform current employee who handle the case
-            }
+            int update2 = caseDAO.updateCaseStatus(status, caseID);
             
-            request.setAttribute("reassignMessage", "Case " + caseID + " has been reassigned to " + newEmp.getName());
-            RequestDispatcher rd = request.getRequestDispatcher("PotentialReassignCasesList.jsp");
-            rd.forward(request, response);
+            boolean sent1 = false;
+            boolean sent2 = false;
+            if (rowUpdate > 0 && update2 > 0) {
+                String message1 = "Dear " + currentEmployeeName + ", <br/><br/>"
+                    + "We would like to inform you that case with ID " + caseID + " has been reassigned to your colleague."
+                    + "<br/> You may continue to work on other cases on hand."
+                    + "<br/><br/> Cheers, "
+                    + "<br/> MOM CCMS Team";
+                sent1 = sendEmail(currentEmployeeEmail, caseID, message1); //Email to inform current employee who handle the case
+                
+//                if(sent1) {
+                String message2 = "Dear " + newEmp.getName() + ", <br/><br/>"
+                    + "We would like to inform you that you have been assigned a new case with ID " + caseID + " has been assigned to you."
+                    + "<br/><br/> Cheers, "
+                    + "<br/> MOM CCMS Team";
+                sent2 = sendEmail(newEmp.getEmail(), caseID, message2); //Email to inform new employee who received the assignment
+//                }
+//        out.println("Case " + caseID + " has been reassigned to " + newEmp.getName());
+            }
+            if(sent1 && sent2) {
+//                out.println("successful");
+                request.setAttribute("reassignMessage", "Case " + caseID + " has been reassigned to " + newEmp.getName());
+                RequestDispatcher rd = request.getRequestDispatcher("PotentialReassignCasesList.jsp");
+                rd.forward(request, response);
+            }
         } finally {
             out.close();
         }
     }
     
-    public void sendEmail(String employeeName, String email, int caseID) {        
+    public boolean sendEmail(String email, int caseID, String email_content) {
+        boolean send = false;
         final String username = "ccms.mom.noreply@gmail.com";
 	final String password = "helloworld01";
         // Recipient's email ID needs to be mentioned.
@@ -123,11 +151,11 @@ public class ProcessCaseReassignController extends HttpServlet {
             message.setSubject("Update on Case " + caseID);
             
             // Now set the actual message
-            String email_content = "Dear " + employeeName + ", <br/><br/>"
-                    + "We would like to inform you that case with ID " + caseID + " has been reassigned to your colleague as to lighten your workload and to achieve overall efficiency."
-                    + "<br/> You may continue to work on other cases on hand."
-                    + "<br/><br/> Cheers, "
-                    + "<br/><br/> MOM CCMS Team";
+//            String email_content = "Dear " + employeeName + ", <br/><br/>"
+//                    + "We would like to inform you that case with ID " + caseID + " has been reassigned to your colleague as to lighten your workload and to achieve overall efficiency."
+//                    + "<br/> You may continue to work on other cases on hand."
+//                    + "<br/><br/> Cheers, "
+//                    + "<br/><br/> MOM CCMS Team";
 
             message.setContent(email_content, "text/html; charset=utf-8");
 
@@ -135,7 +163,9 @@ public class ProcessCaseReassignController extends HttpServlet {
             Transport.send(message);
          } catch (MessagingException mex) {
          mex.printStackTrace();
-      }
+        }
+        send = true;
+        return send;
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">

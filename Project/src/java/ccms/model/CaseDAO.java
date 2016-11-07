@@ -27,8 +27,21 @@ public class CaseDAO {
     private static final String INSERT_TO_CASEHANDLING = "INSERT INTO complaint_case_handling (complaint_case_id, employee_id, received_date, response_date, response, last_saved) VALUES (?, ?, CAST(? AS DATETIME), NULL, NULL, NULL)";
     private static final String UPDATE_CASE_STATUS = "UPDATE complaint_case SET status = ? WHERE complaint_case_id = ?";
     private static final String AUTO_UPDATE_CASE_2_WEEKS = "UPDATE complaint_case SET status = 'Closed' WHERE complaint_case_id IN (SELECT complaint_case_id FROM (SELECT complaint_case_id, MAX(response_date) AS response_date FROM complaint_case_handling WHERE response_date IS NOT NULL GROUP BY complaint_case_id HAVING DATEDIFF(NOW(), response_date) > 14) as temp)";
-    private static final String GET_OUTSTANDING_CASES = "SELECT c.reported_date, cc.issue, cc.difficulty, cc.add_on_date, ch.complaint_case_id, ch.employee_id, MAX(received_date) AS received, ch.response, ch.last_saved FROM cases c, complaint_case_handling ch, complaint_case cc WHERE c.case_id = cc.complaint_case_id AND cc.complaint_case_id = ch.complaint_case_id AND ch.response_date IS NULL GROUP BY ch.complaint_case_id";  
-    private static final String CASE_COUNT_BY_DIFFICULTY = "SELECT ch.employee_id, cc.difficulty, COUNT(cc.difficulty) AS casecountbydiff FROM complaint_case_handling ch, complaint_case cc WHERE cc.complaint_case_id = ch.complaint_case_id AND ch.received_date IN (SELECT MAX(received_date) AS received FROM complaint_case_handling WHERE response_date IS NULL GROUP BY complaint_case_id) GROUP BY ch.employee_id, cc.difficulty";    
+    private static final String GET_OUTSTANDING_CASES = "SELECT e.on_leave_start, e.on_leave_end, c.reported_date, cc.issue, cc.difficulty, cc.add_on_date, ch.complaint_case_id, ch.employee_id, MAX(received_date) AS received, ch.response, ch.last_saved FROM cases c, complaint_case_handling ch, complaint_case cc, employee e WHERE e.employee_id = ch.employee_id AND c.case_id = cc.complaint_case_id AND cc.complaint_case_id = ch.complaint_case_id AND ch.response_date IS NULL GROUP BY ch.complaint_case_id";
+    private static final String CASE_COUNT_BY_DIFFICULTY = "SELECT e.employee_id, temp4.difficulty, COUNT(temp4.difficulty) AS casecountbydiff FROM employee e\n" +
+                                                            "LEFT OUTER JOIN (SELECT temp2.complaint_case_id, temp2.difficulty, temp3.employee_id, temp3.received FROM\n" +
+                                                            "(SELECT cc.complaint_case_id, cc.difficulty, cc.status\n" +
+                                                            "FROM complaint_case cc\n" +
+                                                            "WHERE cc.status <> 'Closed' AND cc.status <> 'Replied') AS temp2\n" +
+                                                            "INNER JOIN\n" +
+                                                            "(SELECT temp1.complaint_case_id, temp1.received, employee_id\n" +
+                                                            "FROM (SELECT complaint_case_id, MAX(received_date) AS received\n" +
+                                                            "    FROM complaint_case_handling\n" +
+                                                            "    GROUP BY complaint_case_id) AS temp1\n" +
+                                                            "INNER JOIN complaint_case_handling ch ON temp1.complaint_case_id = ch.complaint_case_id\n" +
+                                                            "WHERE temp1.received = ch.received_date) AS temp3 ON temp2.complaint_case_id = temp3.complaint_case_id) AS temp4 \n" +
+                                                            "ON e.employee_id = temp4.employee_id\n" +
+                                                            "GROUP BY e.employee_id, temp4.difficulty";    
     private static final String GET_REPORTEDDATE_BY_CASE_ID = "SELECT c.reported_date FROM cases c WHERE c.case_id = ?";
     private static final String GET_DIFFICULTY_BY_EMPID = "SELECT cc.difficulty\n"
             + "FROM complaint_case cc, complaint_case_handling cch\n"
@@ -93,7 +106,7 @@ public class CaseDAO {
 
     public LinkedHashMap<Integer, ArrayList<String>> getCaseCountByDifficulty() throws ParseException {
         LinkedHashMap<Integer, ArrayList<String>> cases = new LinkedHashMap<Integer, ArrayList<String>>();
-        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+        SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy hh:mm a");
         Connection con = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
@@ -179,7 +192,8 @@ public class CaseDAO {
 
     public LinkedHashMap<Integer, ArrayList<String>> getOutstandingCases() throws ParseException {
         LinkedHashMap<Integer, ArrayList<String>> cases = new LinkedHashMap<Integer, ArrayList<String>>();
-        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+        SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy hh:mm a");
+        SimpleDateFormat df1 = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
         Connection con = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
@@ -283,6 +297,7 @@ public class CaseDAO {
     public LinkedHashMap<Integer, ArrayList<String>> getAllCasebyEmpID(int employee_id) throws ParseException {
         LinkedHashMap<Integer, ArrayList<String>> cases = new LinkedHashMap<Integer, ArrayList<String>>();
         SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy hh:mm a");
+        SimpleDateFormat df1 = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
         
         Connection con = null;
         PreparedStatement ps = null;
@@ -317,7 +332,10 @@ public class CaseDAO {
                 String lastSaved = rs.getString("last_saved");
                 if (lastSaved == null) {
                     lastSaved = "-";
-                } 
+                } else {
+                    java.util.Date lastSavedD = df1.parse(lastSaved);
+                    lastSaved = df.format(lastSavedD);
+                }
                 details.add(personNRIC);
                 details.add(dateReceived);
                 details.add(expectedResponseDate);
@@ -360,8 +378,9 @@ public class CaseDAO {
         PreparedStatement ps = null;
         ResultSet rs = null;
         SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-        SimpleDateFormat sdf2 = new SimpleDateFormat("dd-MM-yyyy");
-
+        SimpleDateFormat sdf2 = new SimpleDateFormat("dd/MM/yyyy");
+//        SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy hh:mm a");
+        
         try {
             con = ConnectionManager.getConnection();
             ps = con.prepareStatement(GET_CASE_BY_CASE_ID);
@@ -387,6 +406,7 @@ public class CaseDAO {
                 } else {
                     java.util.Date d = sdf1.parse(addOnDate);
                     addOnDate = "(added on " + sdf2.format(d) + ")";
+//                    addOnDate = "(added on " + d + ")";
                 }
                 String employeeInCharge = String.valueOf(rs.getInt("employee_id"));
                 details.add(String.valueOf(case_id));

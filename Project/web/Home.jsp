@@ -46,7 +46,7 @@
                 <a class="features" href="SearchCase.jsp">
                     <img src="img/search.png"><br>
                     Search</a>
-                <a class="features" href="ReassignCase.jsp">
+                <a class="features" href="/CCMS/ReassignCase">
                     <img src="img/reassign.png"><br>
                     Reassign</a>
                 <a class="features" href="Home.jsp">
