@@ -367,7 +367,7 @@ public class CaseDAO {
             rs = ps.executeQuery();
 
             while (rs.next()) {
-                 String nric = rs.getString("nric");
+                String nric = rs.getString("nric");
                 String email = rs.getString("email");
                 String cName = rs.getString("name");
                 String contact_no = String.valueOf(rs.getInt("contact_no"));

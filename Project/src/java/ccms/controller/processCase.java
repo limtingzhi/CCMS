@@ -27,9 +27,8 @@ import javax.servlet.http.HttpSession;
 public class processCase extends HttpServlet {
 
     /**
-     * Processes requests for both HTTP
-     * <code>GET</code> and
-     * <code>POST</code> methods.
+     * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
+     * methods.
      *
      * @param request servlet request
      * @param response servlet response
@@ -78,8 +77,8 @@ public class processCase extends HttpServlet {
                 errorMsg += "Please fill up the Person's Name.<br>";
             } else if (person_name.length() > 100) {
                 errorMsg += "Max length of Name should be 100.<br>";
-            } 
-            
+            }
+
             if (person_contact == null || person_contact.isEmpty()) {
                 errorMsg += "Please fill up the Person's Contact No.<br>";
             } else if (person_contact.length() > 8) {
@@ -163,7 +162,7 @@ public class processCase extends HttpServlet {
                     request.setAttribute("difficultyToACA", difficulty);
                     request.setAttribute("caseIDToACA", caseIDToPassToACA);
                 }
-                
+
                 // compliment case
                 if (type[0].equals("Compliment") || (type.length == 2 && type[1].equals("Compliment"))) {
                     String caseType = "Compliment";
@@ -181,21 +180,21 @@ public class processCase extends HttpServlet {
 
                 // send emails
                 if (type.length == 2) {
-                    
+
                 }
-                
+
                 if (type[0].equals("Complaint") || (type.length == 2 && type[1].equals("Complaint"))) {
+                    request.setAttribute("gotCompliment", "compliment");
                     dispatcher = request.getRequestDispatcher("/AutoCaseAllocation");
                     dispatcher.forward(request, response);
                 }
 
                 if (type[0].equals("Compliment") || (type.length == 2 && type[1].equals("Compliment"))) {
-                    dispatcher = request.getRequestDispatcher("/ResponseEmail.do");
+                    request.setAttribute("gotCompliment", "compliment");
+                    dispatcher = request.getRequestDispatcher("/SendEmail.do");
                     dispatcher.forward(request, response);
                 }
 
-                
-                
                 HttpSession session = request.getSession();
                 session.setAttribute("successMsg", "Case Created!");
                 response.sendRedirect("CreateCase.jsp");
@@ -213,8 +212,7 @@ public class processCase extends HttpServlet {
 // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
 
     /**
-     * Handles the HTTP
-     * <code>GET</code> method.
+     * Handles the HTTP <code>GET</code> method.
      *
      * @param request servlet request
      * @param response servlet response
@@ -228,8 +226,7 @@ public class processCase extends HttpServlet {
     }
 
     /**
-     * Handles the HTTP
-     * <code>POST</code> method.
+     * Handles the HTTP <code>POST</code> method.
      *
      * @param request servlet request
      * @param response servlet response
