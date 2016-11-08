@@ -120,7 +120,6 @@
         <p class="title-sub"><img src="img/person.png">List of Employees</p>
         <p><i>Current Employee Handling: <%=employeeName%></i></p>
 
-        <form name="reassignCaseForm" method="POST" action="ProcessCaseReassignController.do" />            
         <table class="employees-list">
             <thead>
                 <tr>
@@ -133,14 +132,16 @@
                     <td>Actions</td>
                 </tr>
             </thead>
+
+            <% for (int eID : employees) {%>
+            <form name="reassignCaseForm" method="POST" action="ProcessCaseReassignController.do" />            
             <%
-                for (int eID : employees) {
-                    out.println("<tr>");
-                    ArrayList<String> workload = employeeWorkload.get(eID);
-                    for (String details : workload) {
-                        out.println("<td>" + details + "</td>");
-                    }
-                    if (eID != employeeID) {
+                out.println("<tr>");
+                ArrayList<String> workload = employeeWorkload.get(eID);
+                for (String details : workload) {
+                    out.println("<td>" + details + "</td>");
+                }
+                if (eID != employeeID) {
             %> 
             <td>
                 <div class="img-btn">
@@ -152,13 +153,12 @@
             } else {%>
             <td>-</td>
             <% }
-                    out.println("</tr>");
-                }
-            %>
+                out.println("</tr>");%>
             <input type="hidden" name="caseID" value="<%=caseID%>"/>
             <input type="hidden" name="currentEmployeeID" value="<%=employeeID%>"/>
-        </table>
-    </form> 
+        </form> 
+        <% }%>
+    </table>
     <%
         }
     %>
